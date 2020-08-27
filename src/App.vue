@@ -7,6 +7,29 @@
 
   <hr>
   <br>
+
+  <div style="padding: 0 10vw;">
+  <vxo-slide-select
+    v-model="slide"
+    :items="[
+            {text:'AAA'},
+            {text:'BBB'},
+            {text:'CCC'},
+            {text:'DDD'},
+            {text:'EEE'},
+            {text:'FFF'},
+            {text:'GGG'},
+            {text:'HHH'},
+            {text:'III'},
+            ]"
+    :size="3"
+    ></vxo-slide-select>
+  SLIDE: {{ slide }}
+  </div>
+  
+  <hr>
+  <br>
+
   
 </div>
 </template>
@@ -16,8 +39,7 @@ export default {
   name: "app",
   data: function() {
     return {
-      test: {
-      }
+      slide: null
     }
   },
   methods: {
