@@ -10,13 +10,11 @@ import App from './App.vue'
 Vue.config.productionTip = false
 
 Vue.use(Vuetify, {
-  iconfont: 'mdi'
+  iconfont: 'mdi',
 })
 
 Vue.use(Vxo)
 
 var vue = new Vue({
-  render: h => h(App)
+  render: (h) => h(App),
 }).$mount('#app')
-
-

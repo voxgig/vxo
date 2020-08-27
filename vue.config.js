@@ -4,6 +4,6 @@ module.exports = {
     extract: true,
   },
   pages: {
-    index: 'src/index.js'
+    index: 'src/index.js',
   },
 }

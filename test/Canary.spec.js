@@ -7,7 +7,6 @@ import def from '../src/components/Canary.vue'
 
 Vue.use(Vuetify)
 
-
 describe(def.name, () => {
   it('happy', async () => {
     var props = {}
