@@ -217,6 +217,30 @@ module.exports = !DESCRIPTORS && !fails(function () {
 
 /***/ }),
 
+/***/ "13d5":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__("23e7");
+var $reduce = __webpack_require__("d58f").left;
+var arrayMethodIsStrict = __webpack_require__("a640");
+var arrayMethodUsesToLength = __webpack_require__("ae40");
+
+var STRICT_METHOD = arrayMethodIsStrict('reduce');
+var USES_TO_LENGTH = arrayMethodUsesToLength('reduce', { 1: 0 });
+
+// `Array.prototype.reduce` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.reduce
+$({ target: 'Array', proto: true, forced: !STRICT_METHOD || !USES_TO_LENGTH }, {
+  reduce: function reduce(callbackfn /* , initialValue */) {
+    return $reduce(this, callbackfn, arguments.length, arguments.length > 1 ? arguments[1] : undefined);
+  }
+});
+
+
+/***/ }),
+
 /***/ "159b":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -760,6 +784,32 @@ module.exports = {
 
 /***/ }),
 
+/***/ "4de4":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__("23e7");
+var $filter = __webpack_require__("b727").filter;
+var arrayMethodHasSpeciesSupport = __webpack_require__("1dde");
+var arrayMethodUsesToLength = __webpack_require__("ae40");
+
+var HAS_SPECIES_SUPPORT = arrayMethodHasSpeciesSupport('filter');
+// Edge 14- issue
+var USES_TO_LENGTH = arrayMethodUsesToLength('filter');
+
+// `Array.prototype.filter` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.filter
+// with adding support of @@species
+$({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT || !USES_TO_LENGTH }, {
+  filter: function filter(callbackfn /* , thisArg */) {
+    return $filter(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  }
+});
+
+
+/***/ }),
+
 /***/ "4df4":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -805,6 +855,23 @@ module.exports = function from(arrayLike /* , mapfn = undefined, thisArg = undef
   result.length = index;
   return result;
 };
+
+
+/***/ }),
+
+/***/ "4fad":
+/***/ (function(module, exports, __webpack_require__) {
+
+var $ = __webpack_require__("23e7");
+var $entries = __webpack_require__("6f53").entries;
+
+// `Object.entries` method
+// https://tc39.github.io/ecma262/#sec-object.entries
+$({ target: 'Object', stat: true }, {
+  entries: function entries(O) {
+    return $entries(O);
+  }
+});
 
 
 /***/ }),
@@ -917,6 +984,13 @@ module.exports = {
 
 /***/ }),
 
+/***/ "5a5d":
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+
 /***/ "5c6c":
 /***/ (function(module, exports) {
 
@@ -929,6 +1003,17 @@ module.exports = function (bitmap, value) {
   };
 };
 
+
+/***/ }),
+
+/***/ "5e4e":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var _node_modules_mini_css_extract_plugin_dist_loader_js_ref_8_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_8_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_8_oneOf_1_2_node_modules_sass_loader_dist_cjs_js_ref_8_oneOf_1_3_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TaskBox_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("5a5d");
+/* harmony import */ var _node_modules_mini_css_extract_plugin_dist_loader_js_ref_8_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_8_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_8_oneOf_1_2_node_modules_sass_loader_dist_cjs_js_ref_8_oneOf_1_3_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TaskBox_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_mini_css_extract_plugin_dist_loader_js_ref_8_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_8_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_8_oneOf_1_2_node_modules_sass_loader_dist_cjs_js_ref_8_oneOf_1_3_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TaskBox_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0__);
+/* unused harmony reexport * */
+ /* unused harmony default export */ var _unused_webpack_default_export = (_node_modules_mini_css_extract_plugin_dist_loader_js_ref_8_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_8_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_8_oneOf_1_2_node_modules_sass_loader_dist_cjs_js_ref_8_oneOf_1_3_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TaskBox_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0___default.a); 
 
 /***/ }),
 
@@ -1158,6 +1243,45 @@ var TEMPLATE = String(String).split('String');
 })(Function.prototype, 'toString', function toString() {
   return typeof this == 'function' && getInternalState(this).source || inspectSource(this);
 });
+
+
+/***/ }),
+
+/***/ "6f53":
+/***/ (function(module, exports, __webpack_require__) {
+
+var DESCRIPTORS = __webpack_require__("83ab");
+var objectKeys = __webpack_require__("df75");
+var toIndexedObject = __webpack_require__("fc6a");
+var propertyIsEnumerable = __webpack_require__("d1e7").f;
+
+// `Object.{ entries, values }` methods implementation
+var createMethod = function (TO_ENTRIES) {
+  return function (it) {
+    var O = toIndexedObject(it);
+    var keys = objectKeys(O);
+    var length = keys.length;
+    var i = 0;
+    var result = [];
+    var key;
+    while (length > i) {
+      key = keys[i++];
+      if (!DESCRIPTORS || propertyIsEnumerable.call(O, key)) {
+        result.push(TO_ENTRIES ? [key, O[key]] : O[key]);
+      }
+    }
+    return result;
+  };
+};
+
+module.exports = {
+  // `Object.entries` method
+  // https://tc39.github.io/ecma262/#sec-object.entries
+  entries: createMethod(true),
+  // `Object.values` method
+  // https://tc39.github.io/ecma262/#sec-object.values
+  values: createMethod(false)
+};
 
 
 /***/ }),
@@ -2788,6 +2912,53 @@ module.exports = function (it, TAG, STATIC) {
 
 /***/ }),
 
+/***/ "d58f":
+/***/ (function(module, exports, __webpack_require__) {
+
+var aFunction = __webpack_require__("1c0b");
+var toObject = __webpack_require__("7b0b");
+var IndexedObject = __webpack_require__("44ad");
+var toLength = __webpack_require__("50c4");
+
+// `Array.prototype.{ reduce, reduceRight }` methods implementation
+var createMethod = function (IS_RIGHT) {
+  return function (that, callbackfn, argumentsLength, memo) {
+    aFunction(callbackfn);
+    var O = toObject(that);
+    var self = IndexedObject(O);
+    var length = toLength(O.length);
+    var index = IS_RIGHT ? length - 1 : 0;
+    var i = IS_RIGHT ? -1 : 1;
+    if (argumentsLength < 2) while (true) {
+      if (index in self) {
+        memo = self[index];
+        index += i;
+        break;
+      }
+      index += i;
+      if (IS_RIGHT ? index < 0 : length <= index) {
+        throw TypeError('Reduce of empty array with no initial value');
+      }
+    }
+    for (;IS_RIGHT ? index >= 0 : length > index; index += i) if (index in self) {
+      memo = callbackfn(memo, self[index], index, O);
+    }
+    return memo;
+  };
+};
+
+module.exports = {
+  // `Array.prototype.reduce` method
+  // https://tc39.github.io/ecma262/#sec-array.prototype.reduce
+  left: createMethod(false),
+  // `Array.prototype.reduceRight` method
+  // https://tc39.github.io/ecma262/#sec-array.prototype.reduceright
+  right: createMethod(true)
+};
+
+
+/***/ }),
+
 /***/ "d81d":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2839,6 +3010,37 @@ module.exports =
   Function('return this')();
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__("c8ba")))
+
+/***/ }),
+
+/***/ "dbb4":
+/***/ (function(module, exports, __webpack_require__) {
+
+var $ = __webpack_require__("23e7");
+var DESCRIPTORS = __webpack_require__("83ab");
+var ownKeys = __webpack_require__("56ef");
+var toIndexedObject = __webpack_require__("fc6a");
+var getOwnPropertyDescriptorModule = __webpack_require__("06cf");
+var createProperty = __webpack_require__("8418");
+
+// `Object.getOwnPropertyDescriptors` method
+// https://tc39.github.io/ecma262/#sec-object.getownpropertydescriptors
+$({ target: 'Object', stat: true, sham: !DESCRIPTORS }, {
+  getOwnPropertyDescriptors: function getOwnPropertyDescriptors(object) {
+    var O = toIndexedObject(object);
+    var getOwnPropertyDescriptor = getOwnPropertyDescriptorModule.f;
+    var keys = ownKeys(O);
+    var result = {};
+    var index = 0;
+    var key, descriptor;
+    while (keys.length > index) {
+      descriptor = getOwnPropertyDescriptor(O, key = keys[index++]);
+      if (descriptor !== undefined) createProperty(result, key, descriptor);
+    }
+    return result;
+  }
+});
+
 
 /***/ }),
 
@@ -3054,6 +3256,29 @@ addToUnscopables('entries');
 
 /***/ }),
 
+/***/ "e439":
+/***/ (function(module, exports, __webpack_require__) {
+
+var $ = __webpack_require__("23e7");
+var fails = __webpack_require__("d039");
+var toIndexedObject = __webpack_require__("fc6a");
+var nativeGetOwnPropertyDescriptor = __webpack_require__("06cf").f;
+var DESCRIPTORS = __webpack_require__("83ab");
+
+var FAILS_ON_PRIMITIVES = fails(function () { nativeGetOwnPropertyDescriptor(1); });
+var FORCED = !DESCRIPTORS || FAILS_ON_PRIMITIVES;
+
+// `Object.getOwnPropertyDescriptor` method
+// https://tc39.github.io/ecma262/#sec-object.getownpropertydescriptor
+$({ target: 'Object', stat: true, forced: FORCED, sham: !DESCRIPTORS }, {
+  getOwnPropertyDescriptor: function getOwnPropertyDescriptor(it, key) {
+    return nativeGetOwnPropertyDescriptor(toIndexedObject(it), key);
+  }
+});
+
+
+/***/ }),
+
 /***/ "e538":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3214,7 +3439,7 @@ var web_dom_collections_for_each = __webpack_require__("159b");
 // EXTERNAL MODULE: ./src/vxo.scss
 var vxo = __webpack_require__("efdc");
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"009cbfb4-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/Canary.vue?vue&type=template&id=79abbc37&
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"5984c3bc-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/Canary.vue?vue&type=template&id=79abbc37&
 var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',[_c('v-label',[_vm._v("VXO-CANARY")])],1)}
 var staticRenderFns = []
 
@@ -3353,25 +3578,92 @@ var component = normalizeComponent(
 )
 
 /* harmony default export */ var Canary = (component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"009cbfb4-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/SlideSelect.vue?vue&type=template&id=59c795e8&
-var SlideSelectvue_type_template_id_59c795e8_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"vxo-slide-select"},[_c('vueper-slides',{staticClass:"no-shadow",attrs:{"arrows-outside":"","slide-multiple":"","disable-arrows-on-edges":"","visible-slides":_vm.size,"bullets":false,"infinte":false,"touchable":false,"fixedHeight":_vm.styles.height,"initSlide":_vm.initial}},_vm._l((_vm.slides),function(item,index){return _c('vueper-slide',{key:index,class:_vm.slide_class(index),scopedSlots:_vm._u([{key:"content",fn:function(){return [_c('div',{on:{"click":function($event){return _vm.action_item(item,index)}}},[_vm._t("item",[_c('div',[_vm._v(_vm._s(item.text))])],{"item":item})],2)]},proxy:true}],null,true)})}),1)],1)}
-var SlideSelectvue_type_template_id_59c795e8_staticRenderFns = []
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"5984c3bc-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/TaskBox.vue?vue&type=template&id=42f19441&
+var TaskBoxvue_type_template_id_42f19441_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('v-card',_vm._b({class:_vm.spec.classes},'v-card',_vm.spec.card,false),[(null!=_vm.spec.title)?_c('h3',{on:{"click":_vm.title_toggle}},[_vm._v(" "+_vm._s(_vm.spec.title)+" "),(_vm.spec.ux.title_count)?_c('span',[_vm._v("("+_vm._s(_vm.filtered_items.length)+")")]):_vm._e()]):_vm._e(),(_vm.list_visible)?_c('v-list',_vm._b({},'v-list',_vm.spec.list,false),[_c('draggable',{attrs:{"handle":".vxo-task-box-handle"},model:{value:(_vm.items),callback:function ($$v) {_vm.items=$$v},expression:"items"}},_vm._l((_vm.filtered_items),function(item){return (!item.$remove)?_c('v-list-item',{key:item.id},[(_vm.spec.ux.state)?_c('v-list-item-action',[_c('v-icon',{on:{"click":function($event){return _vm.change_item_state(item)}}},[_vm._v(_vm._s(_vm.item_state_icon(item)))])],1):_vm._e(),(!_vm.has_custom_title)?_c('v-list-item-content',{staticClass:"vxo-task-box-item-title vxo-task-box-item-field"},[(!item.$edit)?_c('span',[_vm._v(" "+_vm._s(item.title)+" ")]):_vm._e(),(item.$edit)?_c('v-text-field',{model:{value:(item.title),callback:function ($$v) {_vm.$set(item, "title", $$v)},expression:"item.title"}}):_vm._e()],1):_vm._e(),_vm._l((_vm.spec.fields),function(field){return _c('v-list-item-content',{key:field.name,staticClass:"vxo-task-box-item-field"},[(field.kind=='text')?_c('span',{style:(_vm.make_text_style(field))},[_vm._v(" "+_vm._s(item[field.name])+" ")]):_vm._e(),(field.kind=='custom')?_vm._t('custom.'+field.name,[_vm._v(" "+_vm._s(item[field.name])+" ")],{"item":item,"field":field}):_vm._e()],2)}),_c('v-spacer'),(_vm.spec.ux.actions)?_c('v-list-item-icon',[(!item.$edit)?_c('v-icon',{on:{"click":function($event){return _vm.remove_item(item)}}},[_vm._v(_vm._s(_vm.spec.icon.remove))]):_vm._e(),(!item.$edit)?_c('v-icon',{staticClass:"vxo-task-box-handle"},[_vm._v(_vm._s(_vm.spec.icon.drag))]):_vm._e(),(item.$edit)?_c('v-icon',{on:{"click":function($event){return _vm.save_item(item)}}},[_vm._v(_vm._s(_vm.spec.icon.save))]):_vm._e()],1):_vm._e()],2):_vm._e()}),1),(_vm.spec.ux.add_item)?_vm._t("footer",[_c('v-list-item',[_c('v-btn',{on:{"click":_vm.add_item}},[_vm._v("{ { spec.text.add_item } }")])],1)],{"add_item":_vm.add_item}):_vm._e()],2):_vm._e()],1)}
+var TaskBoxvue_type_template_id_42f19441_staticRenderFns = []
 
 
-// CONCATENATED MODULE: ./src/components/SlideSelect.vue?vue&type=template&id=59c795e8&
+// CONCATENATED MODULE: ./src/components/TaskBox.vue?vue&type=template&id=42f19441&
 
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.fill.js
-var es_array_fill = __webpack_require__("cb29");
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.filter.js
+var es_array_filter = __webpack_require__("4de4");
 
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.map.js
-var es_array_map = __webpack_require__("d81d");
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.reduce.js
+var es_array_reduce = __webpack_require__("13d5");
 
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.number.constructor.js
-var es_number_constructor = __webpack_require__("a9e3");
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.function.name.js
+var es_function_name = __webpack_require__("b0c0");
 
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.object.assign.js
-var es_object_assign = __webpack_require__("cca6");
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.object.entries.js
+var es_object_entries = __webpack_require__("4fad");
 
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.symbol.js
+var es_symbol = __webpack_require__("a4d3");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.object.get-own-property-descriptor.js
+var es_object_get_own_property_descriptor = __webpack_require__("e439");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.object.get-own-property-descriptors.js
+var es_object_get_own_property_descriptors = __webpack_require__("dbb4");
+
+// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/defineProperty.js
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/objectSpread2.js
+
+
+
+
+
+
+
+
+
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    if (enumerableOnly) symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    });
+    keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+function _objectSpread2(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+
+    if (i % 2) {
+      ownKeys(Object(source), true).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+  }
+
+  return target;
+}
 // CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/arrayLikeToArray.js
 function _arrayLikeToArray(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
@@ -3387,9 +3679,6 @@ function _arrayLikeToArray(arr, len) {
 function _arrayWithoutHoles(arr) {
   if (Array.isArray(arr)) return _arrayLikeToArray(arr);
 }
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.symbol.js
-var es_symbol = __webpack_require__("a4d3");
-
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.symbol.description.js
 var es_symbol_description = __webpack_require__("e01a");
 
@@ -3426,9 +3715,6 @@ function _iterableToArray(iter) {
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.slice.js
 var es_array_slice = __webpack_require__("fb6a");
 
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.function.name.js
-var es_function_name = __webpack_require__("b0c0");
-
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.regexp.to-string.js
 var es_regexp_to_string = __webpack_require__("25f0");
 
@@ -3460,6 +3746,315 @@ function _nonIterableSpread() {
 function _toConsumableArray(arr) {
   return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
 }
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/TaskBox.vue?vue&type=script&lang=js&
+
+
+
+
+
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ var TaskBoxvue_type_script_lang_js_ = ({
+  name: 'vxo-task-box',
+  props: {
+    spec: {
+      type: Object,
+      required: true
+    },
+    filter: {
+      type: Object
+    },
+    value: {
+      type: Array,
+      required: true
+    }
+  },
+  data: function data() {
+    return {
+      items: [],
+      list_visible: this.spec.ux.init_list_visible
+    };
+  },
+  beforeCreate: function beforeCreate() {
+    var spec = this.$options.propsData.spec;
+    init_spec(spec);
+  },
+  created: function created() {
+    this.items = _toConsumableArray(this.value);
+  },
+  watch: {
+    spec: function spec(val) {
+      init_spec(val);
+    }
+  },
+  computed: {
+    has_custom_title: function has_custom_title() {
+      return this.spec.fields.filter(function (f) {
+        return f.name === 'title';
+      }).length > 0;
+    },
+    filtered_items: function filtered_items() {
+      var _this = this;
+
+      if (this.filter) {
+        return this.items.filter(function (item) {
+          return Object.entries(_this.filter).reduce(function (o, e) {
+            return o && item[e[0]] === e[1];
+          }, true);
+        });
+      } else {
+        return this.items;
+      }
+    }
+  },
+  methods: {
+    add_item: function add_item() {
+      this.items.push(this.new_item());
+    },
+    new_item: function new_item() {
+      return {
+        $new: true,
+        $edit: true,
+        id: this.make_id(),
+        title: '',
+        state: 'todo'
+      };
+    },
+    remove_item: function remove_item(item) {
+      item.$remove = true;
+      this.$forceUpdate();
+    },
+    save_item: function save_item(item) {
+      item.$edit = false;
+    },
+    make_id: function make_id() {
+      return (Math.random() + '').substring(2);
+    },
+    item_state_icon: function item_state_icon(item) {
+      return this.spec.icon.$state[item.state] || 'mdi-circle-outline';
+    },
+    change_item_state: function change_item_state(item) {
+      item.state = this.spec.statemap[item.state] || 'todo';
+    },
+    make_text_style: function make_text_style(field) {
+      var style = {};
+
+      if (field.color) {
+        style.color = field.color;
+      }
+
+      return style;
+    },
+    title_toggle: function title_toggle() {
+      this.list_visible = !this.list_visible;
+    }
+  }
+});
+
+function init_spec(spec) {
+  spec.card = _objectSpread2({}, spec.card);
+  spec.list = _objectSpread2({}, spec.list);
+  spec.text = _objectSpread2({
+    add_item: 'Add Item'
+  }, spec.text);
+  spec.icon = _objectSpread2({
+    save: 'mdi-checkbox-marked',
+    remove: 'mdi-close-box',
+    drag: 'mdi-apps-box'
+  }, spec.icon);
+  spec.icon.$state = _objectSpread2({
+    done: 'mdi-check-circle-outline',
+    todo: 'mdi-circle-outline'
+  }, spec.icon.$state);
+  spec.classes = _objectSpread2({
+    'vxo-task-box': true
+  }, spec.classes);
+  spec.statemap = _objectSpread2({
+    done: 'todo',
+    todo: 'done'
+  }, spec.statemap);
+  spec.fields = _toConsumableArray(spec.fields || []);
+  spec.ux = _objectSpread2({
+    state: true,
+    actions: true,
+    title_count: false,
+    title_toggle: true,
+    add_item: true,
+    init_list_visible: true
+  }, spec.ux);
+}
+// CONCATENATED MODULE: ./src/components/TaskBox.vue?vue&type=script&lang=js&
+ /* harmony default export */ var components_TaskBoxvue_type_script_lang_js_ = (TaskBoxvue_type_script_lang_js_); 
+// EXTERNAL MODULE: ./src/components/TaskBox.vue?vue&type=style&index=0&lang=scss&
+var TaskBoxvue_type_style_index_0_lang_scss_ = __webpack_require__("5e4e");
+
+// CONCATENATED MODULE: ./src/components/TaskBox.vue
+
+
+
+
+
+
+/* normalize component */
+
+var TaskBox_component = normalizeComponent(
+  components_TaskBoxvue_type_script_lang_js_,
+  TaskBoxvue_type_template_id_42f19441_render,
+  TaskBoxvue_type_template_id_42f19441_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var TaskBox = (TaskBox_component.exports);
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"5984c3bc-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/SlideSelect.vue?vue&type=template&id=59c795e8&
+var SlideSelectvue_type_template_id_59c795e8_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"vxo-slide-select"},[_c('vueper-slides',{staticClass:"no-shadow",attrs:{"arrows-outside":"","slide-multiple":"","disable-arrows-on-edges":"","visible-slides":_vm.size,"bullets":false,"infinte":false,"touchable":false,"fixedHeight":_vm.styles.height,"initSlide":_vm.initial}},_vm._l((_vm.slides),function(item,index){return _c('vueper-slide',{key:index,class:_vm.slide_class(index),scopedSlots:_vm._u([{key:"content",fn:function(){return [_c('div',{on:{"click":function($event){return _vm.action_item(item,index)}}},[_vm._t("item",[_c('div',[_vm._v(_vm._s(item.text))])],{"item":item})],2)]},proxy:true}],null,true)})}),1)],1)}
+var SlideSelectvue_type_template_id_59c795e8_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/SlideSelect.vue?vue&type=template&id=59c795e8&
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.fill.js
+var es_array_fill = __webpack_require__("cb29");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.map.js
+var es_array_map = __webpack_require__("d81d");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.number.constructor.js
+var es_number_constructor = __webpack_require__("a9e3");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.object.assign.js
+var es_object_assign = __webpack_require__("cca6");
+
 // CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/SlideSelect.vue?vue&type=script&lang=js&
 
 
@@ -3606,6 +4201,7 @@ var SlideSelect_component = normalizeComponent(
 
 
 
+
 var Vxo = {
   found: []
 };
@@ -3613,6 +4209,7 @@ var Vxo = {
 Vxo.install = function (Vue, options) {
   var co = {
     VxoCanary: Canary,
+    VxoTaskBox: TaskBox,
     VxoSlideSelect: SlideSelect
   };
   Object.keys(co).forEach(function (name) {

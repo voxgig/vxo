@@ -11,7 +11,7 @@ describe(def.name, () => {
   it('happy', async () => {
     var props = {
       spec: {},
-      value: []
+      value: [],
     }
 
     var wrapper = make_component({ Vue, mount, def, props })
