@@ -1,6 +1,7 @@
 import './vxo.scss'
 
 import VxoCanary from './components/Canary.vue'
+import VxoTaskBox from './components/TaskBox.vue'
 import VxoSlideSelect from './components/SlideSelect.vue'
 
 const Vxo = {
@@ -10,6 +11,7 @@ const Vxo = {
 Vxo.install = function (Vue, options) {
   var co = {
     VxoCanary,
+    VxoTaskBox,
     VxoSlideSelect,
   }
 

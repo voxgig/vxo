@@ -56,6 +56,7 @@
     "vue-template-compiler": "2.6.12",
     "vuetify": "2.3.10",
     "webpack-node-externals": "2.5.2",
+    "vuedraggable": "2.24.1",
     "vueperslides": "2.10.3"
   }
 }

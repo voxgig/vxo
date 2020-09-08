@@ -9,6 +9,8 @@ import 'vuetify/dist/vuetify.min.css'
 import { VueperSlides, VueperSlide } from 'vueperslides'
 import 'vueperslides/dist/vueperslides.css'
 
+import draggable from 'vuedraggable'
+
 import Vxo from './vxo.js'
 import App from './App.vue'
 
@@ -18,6 +20,8 @@ Vue.prototype.$Moment = Moment
 
 Vue.component('vueper-slides', VueperSlides)
 Vue.component('vueper-slide', VueperSlide)
+
+Vue.component('draggable', draggable)
 
 Vue.use(Vuetify, {
   iconfont: 'mdi',
