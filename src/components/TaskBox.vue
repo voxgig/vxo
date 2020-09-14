@@ -9,10 +9,31 @@
         v-if="spec.ux.title_count"
         >({{ filtered_items.length }})</span>
     </h3>
+
     <v-list
       v-bind="spec.list"
       v-if="list_visible"
+      class="vxo-task-box-items"
       >
+
+      <slot
+        name="header"
+        v-if="spec.ux.headers"
+        >
+        <v-list-item>
+          <v-list-item-content
+            v-for="(header,index) in headers"
+            :key="index"
+            class="vxo-task-box-item-field vxo-task-box-item-header"
+            >{{ header.title }}</v-list-item-content>
+          <v-spacer
+            v-if="spec.ux.actions"
+            />
+        </v-list-item>
+
+      </slot>
+
+
       <draggable
         v-model="items"
         handle=".vxo-task-box-handle"
@@ -73,7 +94,9 @@
           
         </v-list-item-content>
 
-        <v-spacer />
+        <v-spacer
+          v-if="spec.ux.actions"
+          />
         
         <v-list-item-icon
           v-if="spec.ux.actions"
@@ -122,6 +145,9 @@
 }
 .vxo-task-box-item {
     padding-left: 8px;
+}
+.vxo-task-box-item-header {
+    font-wieght: bold;
 }
 </style>
 
@@ -176,6 +202,9 @@ export default {
       else {
         return this.items
       }
+    },
+    headers: function() {
+      return this.spec.ux.headers
     }
   },
   methods: {
