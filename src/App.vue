@@ -2,6 +2,18 @@
 <div>
   <h1>TESTBED</h1>
 
+  <p style="font-size:1rem">
+  9:30: <vxo-time :time="930" /> <br>
+  9:30AM: <vxo-time :time="930" clock="MM"/> <br>
+  9:30a: <vxo-time :time="930" clock="m"/> <br>
+  2:30p: <vxo-time :time="1430" clock="m"/> <br>
+  12:00PM: <vxo-time :time="1200" clock="MM"/> <br>
+  12:00AM: <vxo-time :time="0" clock="MM"/> <br>
+  9:30&ndash;15:15: <vxo-time :time="{start:930, end:1515}" /> <br>
+  9:30a&ndash;3:15p: <vxo-time :time="{start:930, end:1515}" clock="m"/> <br>
+  </p>
+  
+  <!--
   
   <vxo-task-box
     :spec="test.taskbox0.spec"
@@ -15,7 +27,7 @@
   <hr>
   <br>
 
-  <!--
+
   <vxo-slide-select
     :items="test.slideselect0.items"
     :size="3"

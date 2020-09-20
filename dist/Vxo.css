@@ -1,1 +1,36 @@
-.vxo-task-box>h3{cursor:pointer}.vxo-task-box-handle{cursor:-webkit-grab;cursor:grab}.vxo-task-box-item,.vxo-task-box-item-title{padding-left:8px}.vxo-task-box-item-header{font-wieght:bold}.vxo-slide-select{margin:auto}.vxo-slide-select .vueperslides{border-left:1px solid #ccc;border-right:1px solid #ccc}.vxo-slide-select-item{text-align:center;border-top:1px solid #ccc;border-bottom:1px solid #ccc;border-right:1px solid #ccc}.vxo-slide-select-item div{height:100%}.vxo-slide-select-item-rightmost{border-right:0}
+
+.vxo-task-box > h3 {
+  cursor: pointer;
+}
+.vxo-task-box-handle {
+  cursor: -webkit-grab;
+  cursor: grab;
+}
+.vxo-task-box-item-title {
+  padding-left: 8px;
+}
+.vxo-task-box-item {
+  padding-left: 8px;
+}
+.vxo-task-box-item-header {
+  font-wieght: bold;
+}
+.vxo-slide-select {
+  margin: auto;
+}
+.vxo-slide-select .vueperslides {
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+}
+.vxo-slide-select-item {
+  text-align: center;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+}
+.vxo-slide-select-item div {
+  height: 100%;
+}
+.vxo-slide-select-item-rightmost {
+  border-right: 0px;
+}
