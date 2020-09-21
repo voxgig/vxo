@@ -74,6 +74,7 @@
           v-for="field in spec.fields"
           :key="field.name"
           class="vxo-task-box-item-field"
+          :data-field-name="field.name"
           >
 
           <span
