@@ -189,7 +189,8 @@ export default {
   },
   computed: {
     has_custom_title: function() {
-      return this.spec.fields.filter(f=>f.name==='title').length>0
+      return this.spec.custom.title ||
+        this.spec.fields.filter(f=>f.name==='title').length>0
     },
     filtered_items: function() {
       if(this.filter) {
@@ -300,6 +301,11 @@ function init_spec(spec) {
     init_list_visible: true,
     ...spec.ux
   }
+
+  spec.custom = {
+    ...spec.custom
+  } 
+
 }
 </script>
 
