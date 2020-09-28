@@ -27,8 +27,19 @@ Vue.use(Vuetify, {
   iconfont: 'mdi',
 })
 
+var vuetify = new Vuetify()
+
 Vue.use(Vxo)
 
+Vue.component('foo-bar', {
+  template: `
+<b>FOOBAR {{ task.foo }} </b>
+`,
+  props: ['task']
+})
+
+
 var vue = new Vue({
+  vuetify,
   render: (h) => h(App),
 }).$mount('#app')

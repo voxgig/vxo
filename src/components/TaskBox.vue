@@ -42,6 +42,7 @@
         v-for="item in filtered_items"
         :key="item.id"
         v-if="!item.$remove"
+        @click="act_item(item)"
         >
 
         <v-list-item-action
@@ -108,12 +109,16 @@
             >{{ spec.icon.remove }}</v-icon>
           <v-icon
             v-if="!item.$edit"
-            class="vxo-task-box-handle"
-            >{{ spec.icon.drag }}</v-icon>
+            @click="edit_item(item)"
+            >{{ spec.icon.edit }}</v-icon>
           <v-icon
             v-if="item.$edit"
             @click="save_item(item)"
             >{{ spec.icon.save }}</v-icon>
+          <v-icon
+            v-if="!item.$edit"
+            class="vxo-task-box-handle"
+            >{{ spec.icon.drag }}</v-icon>
         </v-list-item-icon>
         
       </v-list-item>
@@ -127,10 +132,29 @@
         <v-list-item>
           <v-btn
             @click="add_item"
-            >{ { spec.text.add_item } }</v-btn>
+            >{{ spec.text.add_item }}</v-btn>
         </v-list-item>
       </slot>
     </v-list>
+
+    <task-box-editor
+      v-model="edit"
+      :spec="spec"
+      :task="edit_task"
+      >
+      <template
+        v-for="field in spec.fields"
+        v-slot:[edit_slot(field)]
+        >
+        <slot
+          :name="'edit.'+field.name"
+          :task="edit_task"
+          :field="field"
+          :spec="spec"
+          >
+        </slot>
+      </template>
+    </task-box-editor>
   </v-card>
 </template>
 
@@ -139,23 +163,28 @@
     cursor: pointer;
 }
 .vxo-task-box-handle {
-    cursor:grab;               
+    cursor: grab;               
 }
 .vxo-task-box-item-title {
-    padding-left: 8px;
+    xpadding-left: 8px;
 }
 .vxo-task-box-item {
-    padding-left: 8px;
+    xpadding-left: 8px;
 }
 .vxo-task-box-item-header {
-    font-wieght: bold;
+    xfont-wieght: bold;
 }
 </style>
 
 
 <script>
+import TaskBoxEditor from './TaskBoxEditor.vue'
+
 export default {
   name: 'vxo-task-box',
+  components: {
+    'task-box-editor': TaskBoxEditor
+  },
   props: {
     spec: {
       type: Object,
@@ -171,6 +200,8 @@ export default {
   },
   data: function() {
     return {
+      edit: false,
+      edit_task: {},
       items: [],
       list_visible: this.spec.ux.init_list_visible
     }
@@ -210,6 +241,9 @@ export default {
     }
   },
   methods: {
+    edit_slot: function(field) {
+      return 'edit.'+field.name
+    },
     add_item: function() {
       this.items.push(this.new_item())
     },
@@ -228,6 +262,13 @@ export default {
     },
     save_item: function(item) {
       item.$edit = false
+    },
+    edit_item: function(item) {
+      this.edit = true
+      this.edit_task = item
+    },
+    act_item: function(item) {
+      this.edit_item(item)
     },
     make_id: function() {
       return (Math.random()+'').substring(2)
@@ -269,6 +310,7 @@ function init_spec(spec) {
     save: 'mdi-checkbox-marked',
     remove: 'mdi-close-box',
     drag: 'mdi-apps-box',
+    edit: 'mdi-pencil-box',
     ...spec.icon
   } 
   
