@@ -20,7 +20,9 @@
         name="header"
         v-if="spec.ux.headers"
         >
-        <v-list-item>
+        <v-list-item
+          class="vxo-task-box-item-headers"
+          >
           <v-list-item-content
             v-for="(header,index) in headers"
             :key="index"
@@ -42,40 +44,44 @@
         v-for="item in filtered_items"
         :key="item.id"
         v-if="!item.$remove"
-        @click="act_item(item)"
         >
-
-        <v-list-item-action
-          v-if="spec.ux.state"
-          >
-          <v-icon
-            @click="change_item_state(item)"
-            >{{ item_state_icon(item) }}</v-icon>
-        </v-list-item-action>
         
         <v-list-item-content
           v-if="!has_custom_title"
           class="vxo-task-box-item-title vxo-task-box-item-field"
           >
+          <v-icon
+            left
+            style="max-width:32px"
+            v-if="spec.ux.state"
+            @click.stop.prevent="change_item_state(item)"
+            >{{ item_state_icon(item) }}</v-icon>
+
           <span
+            style="display:inline-block;max-width:90%;"
             v-if="!item.$edit"
+            @click="item_title_action($event,item)"
             >
             {{ item.title }}
           </span>
 
           <v-text-field
+            outlined
+            hide-details
             v-if="item.$edit"
             v-model="item.title"
+            @keyup.enter="item_title_save(item)"
             >
           </v-text-field>
 
         </v-list-item-content>
 
         <v-list-item-content
-          v-for="field in spec.fields"
+          v-for="field in field_list"
           :key="field.name"
           class="vxo-task-box-item-field"
           :data-field-name="field.name"
+          @click="act_item(item)"
           >
 
           <span
@@ -141,6 +147,9 @@
       v-model="edit"
       :spec="spec"
       :task="edit_task"
+      @toggle_status="toggle_status"
+      @update_field="update_field"
+      @create_task="create_task"
       >
       <template
         v-for="field in spec.fields"
@@ -166,19 +175,26 @@
     cursor: grab;               
 }
 .vxo-task-box-item-title {
-    xpadding-left: 8px;
+    min-width: 50%;
 }
-.vxo-task-box-item {
-    xpadding-left: 8px;
+.vxo-task-box-item-field {
+    &:first-of-type {
+        min-width: 50%;
+    }
 }
 .vxo-task-box-item-header {
-    xfont-wieght: bold;
+    &:first-of-type {
+        min-width: 50%;
+    }
 }
 </style>
 
 
 <script>
+import Common from './common'
 import TaskBoxEditor from './TaskBoxEditor.vue'
+
+const { clone } = Common
 
 export default {
   name: 'vxo-task-box',
@@ -196,7 +212,13 @@ export default {
     value: {
       type: Array,
       required: true      
-    }
+    },
+    trigger: {
+      type: Object,
+      default: {
+        new_task: {}
+      }
+    },
   },
   data: function() {
     return {
@@ -212,17 +234,30 @@ export default {
     init_spec(spec)
   },
   created: function() {
-    this.items = [...this.value]
+    this.items = [...this.value||[]].map(item=>{
+      item = clone(item)
+      item.$edit = false
+      return item
+    })
   },
   watch: {
     spec: function(val) {
       init_spec(val)
+    },
+    'trigger.new_task': function(new_task) {
+      var new_item = clone(new_task)
+      console.log('VTB new_item', new_task)
+      this.edit_item(new_item)
     }
   },
   computed: {
+    field_list: function() {
+      var fields = this.spec.fields.filter(f=>f.name!=='title') 
+      return fields
+    },
     has_custom_title: function() {
       return this.spec.custom.title ||
-        this.spec.fields.filter(f=>f.name==='title').length>0
+        this.spec.fields.filter(f=>f.name==='title' && f.custom).length>0
     },
     filtered_items: function() {
       if(this.filter) {
@@ -279,6 +314,40 @@ export default {
     change_item_state: function(item) {
       item.state = this.spec.statemap[item.state] || 'todo'
     },
+
+    toggle_status: function() {
+      if(this.edit_task) {
+        this.change_item_state(this.edit_task)
+      }
+    },
+    update_field: function({field,item}) {
+      if(this.edit_task) {
+        this.edit_task[field.name] = item[field.name]
+      }
+    },
+    create_task: function(item) {
+      delete item.$new
+      var new_item = clone(item)
+      console.log('VTB create_task', new_item)
+      //this.items = this.items.concat(new_item)
+      this.items = [...this.items,new_item]
+    },
+
+    item_title_action: function(event, item) {
+      if(this.spec.item.title_edit) {
+        event.stopPropagation()
+        event.preventDefault()
+        item.$edit=true
+        console.log('VTB item_title_action', item)
+      }
+      else {
+        this.act_item(item)
+      }
+    },
+    item_title_save: function(item) {
+      console.log('VTB item_title_save', item)
+      item.$edit = false
+    },
     make_text_style: function(field) {
       let style = {}
       if(field.color) {
@@ -296,7 +365,11 @@ function init_spec(spec) {
   spec.card = {
     ...spec.card
   } 
-  
+
+  spec.dialog = {
+    ...spec.dialog
+  } 
+
   spec.list = {
     ...spec.list
   } 
@@ -305,6 +378,12 @@ function init_spec(spec) {
     add_item: 'Add Item',
     ...spec.text
   } 
+
+  spec.item = {
+    title_edit: true,
+    ...spec.item
+  } 
+
   
   spec.icon = {
     save: 'mdi-checkbox-marked',
@@ -335,6 +414,7 @@ function init_spec(spec) {
     ...(spec.fields||[])
   ]
 
+  
   spec.ux = {
     state: true,
     actions: true,
@@ -342,9 +422,16 @@ function init_spec(spec) {
     title_toggle: true,
     add_item: true,
     init_list_visible: true,
+    toolbar: true,
+    toolbar_status_btn_text_map: {
+      done: 'Mark not done',
+      todo: 'Mark done',
+    },
+    toolbar_btn_class: '',
     ...spec.ux
   }
 
+  
   spec.custom = {
     ...spec.custom
   } 

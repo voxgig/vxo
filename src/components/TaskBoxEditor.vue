@@ -1,10 +1,36 @@
 <template>
 <v-dialog
   v-model="open"
+  v-bind="spec.dialog"
   >
   <v-card
     class="vxo-task-box-editor"
     >
+
+    <v-toolbar
+      v-if="spec.ux.toolbar"
+      dense
+      flat
+      class="vxo-task-box-toolbar"
+      >
+      <v-btn
+        v-if="!item.$new"
+        outlined
+        :class="spec.ux.toolbar_btn_class"
+        @click="toggle_status"
+        > {{ spec.ux.toolbar_status_btn_text_map[item.state] }} </v-btn>
+
+      <v-btn
+        v-if="item.$new"
+        outlined
+        :class="spec.ux.toolbar_btn_class"
+        @click="create_task(item)"
+        > Create Task </v-btn>
+
+      <v-spacer />
+      <v-icon @click="open=false">mdi-close</v-icon>
+    </v-toolbar>
+
     <ul
       class="vxo-task-box-editor-items"
       >
@@ -12,8 +38,6 @@
         v-for="field in fields"
         :key="field.index"
         >
-
-        {{ field }}
 
         <div
           v-if="'done' === field.kind"
@@ -34,6 +58,9 @@
           v-model="item[field.name]"
           :label="field.label"
           class="vxo-task-box-editor-item"
+          :data-field-name="field.name"
+          @change="update_field(field,item)"
+          placeholder="--"
           >
         </v-text-field>
 
@@ -67,6 +94,13 @@
 <style lang="scss">
 .vxo-task-box-editor {
     padding: var(--vxo-s4);
+    height: 100%;
+
+    .vxo-task-box-toolbar {
+        .v-toolbar__content {
+            padding: 0;
+        }
+    }
     
     .vxo-task-box-editor-items {
         list-style-type: none;
@@ -124,12 +158,18 @@ export default {
     task: function() {
       this.init_task()
     },
+    'task.state': function() {
+      this.init_task()
+    },
   },
   methods: {
     init_spec: function() {
       this.open = this.value
 
       var spec = this.spec
+
+      
+
       var fields = this.fields = []
 
       for(var i = 0; i < spec.fields.length; i++) {
@@ -148,6 +188,16 @@ export default {
     init_task: function() {
       this.item = clone(this.task) || {}
     },
+    toggle_status: function() {
+      this.$emit('toggle_status')
+    },
+    update_field: function(field,item) {
+      this.$emit('update_field', {field,item})
+    },
+    create_task: function(item) {
+      this.$emit('create_task', item)
+      this.open = false
+    }
   }
 }
 </script>
