@@ -215,9 +215,9 @@ export default {
     },
     trigger: {
       type: Object,
-      default: {
+      default: ()=>({
         new_task: {}
-      }
+      })
     },
   },
   data: function() {
@@ -236,6 +236,7 @@ export default {
   created: function() {
     this.items = [...this.value||[]].map(item=>{
       item = clone(item)
+      item.$mark = Math.random()
       item.$edit = false
       return item
     })
@@ -246,7 +247,9 @@ export default {
     },
     'trigger.new_task': function(new_task) {
       var new_item = clone(new_task)
-      console.log('VTB new_item', new_task)
+      new_item.$mark = Math.random()
+      new_item.$edit = false
+      new_item.$new = true
       this.edit_item(new_item)
     }
   },
@@ -328,8 +331,6 @@ export default {
     create_task: function(item) {
       delete item.$new
       var new_item = clone(item)
-      console.log('VTB create_task', new_item)
-      //this.items = this.items.concat(new_item)
       this.items = [...this.items,new_item]
     },
 
@@ -338,14 +339,12 @@ export default {
         event.stopPropagation()
         event.preventDefault()
         item.$edit=true
-        console.log('VTB item_title_action', item)
       }
       else {
         this.act_item(item)
       }
     },
     item_title_save: function(item) {
-      console.log('VTB item_title_save', item)
       item.$edit = false
     },
     make_text_style: function(field) {

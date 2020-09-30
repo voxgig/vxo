@@ -1,5 +1,5 @@
 export default {
-  clone: (x)=>JSON.parse(JSON.stringify(x)),
+  clone: (x) => JSON.parse(JSON.stringify(x)),
 
   taskbox: {
     field: {
@@ -8,7 +8,7 @@ export default {
         done: true,
         custom: true,
         component: true,
-      }
-    }
-  }
+      },
+    },
+  },
 }
