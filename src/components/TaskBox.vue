@@ -302,8 +302,10 @@ export default {
       item.$edit = false
     },
     edit_item: function(item) {
-      this.edit = true
-      this.edit_task = item
+      if(this.spec.ux.edit_dialog) {
+        this.edit = true
+        this.edit_task = item
+      }
     },
     act_item: function(item) {
       this.edit_item(item)
@@ -427,6 +429,7 @@ function init_spec(spec) {
       todo: 'Mark done',
     },
     toolbar_btn_class: '',
+    edit_dialog: true,
     ...spec.ux
   }
 
