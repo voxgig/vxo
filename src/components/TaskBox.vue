@@ -234,12 +234,7 @@ export default {
     init_spec(spec)
   },
   created: function() {
-    this.items = [...this.value||[]].map(item=>{
-      item = clone(item)
-      item.$mark = Math.random()
-      item.$edit = false
-      return item
-    })
+    this.init()
   },
   watch: {
     spec: function(val) {
@@ -251,6 +246,9 @@ export default {
       new_item.$edit = false
       new_item.$new = true
       this.edit_item(new_item)
+    },
+    value: function() {
+      this.init()
     }
   },
   computed: {
@@ -263,6 +261,8 @@ export default {
         this.spec.fields.filter(f=>f.name==='title' && f.custom).length>0
     },
     filtered_items: function() {
+      console.log('VTB filtered_items', this.items, this.filter)
+
       if(this.filter) {
         return this.items.filter(
           item => 
@@ -279,6 +279,14 @@ export default {
     }
   },
   methods: {
+    init: function() {
+      this.items = [...this.value||[]].map(item=>{
+        item = clone(item)
+        item.$mark = Math.random()
+        item.$edit = false
+        return item
+      })
+    },
     edit_slot: function(field) {
       return 'edit.'+field.name
     },
