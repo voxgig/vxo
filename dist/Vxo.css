@@ -27,6 +27,9 @@
 .vxo-task-box-item-title {
   min-width: 50%;
 }
+.vxo-task-box-item-title span {
+  max-width: 80%;
+}
 .vxo-task-box-item-field:first-of-type {
   min-width: 50%;
 }

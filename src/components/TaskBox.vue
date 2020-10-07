@@ -58,7 +58,6 @@
             >{{ item_state_icon(item) }}</v-icon>
 
           <span
-            style="display:inline-block;max-width:90%;"
             v-if="!item.$edit"
             @click="item_title_action($event,item)"
             >
@@ -176,6 +175,9 @@
 }
 .vxo-task-box-item-title {
     min-width: 50%;
+    span {
+        max-width: 80%;
+    }
 }
 .vxo-task-box-item-field {
     &:first-of-type {
