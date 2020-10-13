@@ -1,15 +1,32 @@
 <template>
   <v-card v-bind="spec.card" :class="spec.classes">
-    <h3
-      v-if="null!=spec.title"
-      @click="title_toggle"
+    <v-toolbar
+      flat
+      dense
       >
-      {{ spec.title }}
-      <span
-        v-if="spec.ux.title_count"
-        >({{ filtered_items.length }})</span>
-    </h3>
+      <h3
+        v-if="null!=spec.title"
+        @click="title_toggle"
+        >
+        {{ spec.title }}
+        <span
+          v-if="spec.ux.title_count"
+          >({{ filtered_items.length }})</span>
+      </h3>
 
+      <v-spacer
+        v-if="spec.tool.add.active"
+        ></v-spacer>
+      
+      <v-btn
+        v-if="spec.tool.add.active"
+        v-bind="spec.tool.add.props"
+        @click.stop.prevent="add_item"
+        >
+        {{ spec.tool.add.text }}
+        </v-btn>
+    </v-toolbar>
+    
     <v-list
       v-bind="spec.list"
       v-if="list_visible"
@@ -424,6 +441,20 @@ function init_spec(spec) {
   spec.fields = [
     ...(spec.fields||[])
   ]
+
+
+  spec.tool = spec.tool || {}
+
+  spec.tool.add = {
+    active: false,
+    text: 'Add Item',
+    ...spec.tool.add
+  }
+
+  spec.tool.add.props = {
+    ...spec.tool.add.props
+  }
+
 
   
   spec.ux = {
