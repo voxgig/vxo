@@ -9,6 +9,7 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'vue/no-use-v-if-with-v-for': 'off',
     'vue/custom-event-name-casing': 'off',
+    'vue/valid-v-slot': 'off',
   },
   parserOptions: {
     parser: 'babel-eslint'

@@ -11,7 +11,7 @@
         {{ spec.title }}
         <span
           v-if="spec.ux.title_count"
-          >({{ filtered_items.length }})</span>
+          >({{ items.length }})</span>
       </h3>
 
       <v-spacer
@@ -26,7 +26,8 @@
         {{ spec.tool.add.text }}
         </v-btn>
     </v-toolbar>
-    
+
+
     <v-list
       v-bind="spec.list"
       v-if="list_visible"
@@ -44,6 +45,7 @@
             v-for="(header,index) in headers"
             :key="index"
             class="vxo-task-box-item-field vxo-task-box-item-header"
+            :style="header.styling"
             >{{ header.title }}</v-list-item-content>
           <v-spacer
             v-if="spec.ux.actions"
@@ -58,11 +60,12 @@
         handle=".vxo-task-box-handle"
         >
       <v-list-item
-        v-for="item in filtered_items"
+        v-for="item in items"
         :key="item.id"
         v-if="!item.$remove"
+        :class="list_item_classes(item)"
         >
-        
+
         <v-list-item-content
           v-if="!has_custom_title"
           class="vxo-task-box-item-title vxo-task-box-item-field"
@@ -70,32 +73,42 @@
           <v-icon
             left
             style="max-width:32px"
-            v-if="spec.ux.state"
+            v-if="spec.ux.state && !item.$empty"
             @click.stop.prevent="change_item_state(item)"
             >{{ item_state_icon(item) }}</v-icon>
 
-          <span
-            v-if="!item.$edit"
+          <p
+            v-if="!item.$edit && !item.$empty"
             @click="item_title_action($event,item)"
             >
             {{ item.title }}
-          </span>
+
+            <!--
+            <small>
+              adder: {{ item.$adder }}
+              edit: {{ item.$edit }}
+              empty: {{ item.$empty }}
+            </small>
+            -->
+          </p>
 
           <v-text-field
             outlined
             hide-details
-            v-if="item.$edit"
+            v-if="item.$edit && !item.$empty"
             v-model="item.title"
             @keyup.enter="item_title_save(item)"
+            :ref="'item'+item.$index"
             >
           </v-text-field>
-
         </v-list-item-content>
+
 
         <v-list-item-content
           v-for="field in field_list"
           :key="field.name"
           class="vxo-task-box-item-field"
+          :style="field.styling"
           :data-field-name="field.name"
           @click="act_item(item)"
           >
@@ -115,13 +128,15 @@
             >
             {{ item[field.name] }}
           </slot>
-          
+
         </v-list-item-content>
 
+    
         <v-spacer
           v-if="spec.ux.actions"
           />
-        
+
+    
         <v-list-item-icon
           v-if="spec.ux.actions"
           >
@@ -142,7 +157,8 @@
             class="vxo-task-box-handle"
             >{{ spec.icon.drag }}</v-icon>
         </v-list-item-icon>
-        
+
+    
       </v-list-item>
       </draggable>
 
@@ -192,8 +208,14 @@
 }
 .vxo-task-box-item-title {
     min-width: 50%;
-    span {
-        max-width: 80%;
+    display: flex;
+    overflow-x: scroll;
+    > * {
+        margin: 4px !important;
+        flex: 0 1 auto;
+    }
+    > .v-input {
+        flex-grow: 1;
     }
 }
 .vxo-task-box-item-field {
@@ -279,20 +301,6 @@ export default {
       return this.spec.custom.title ||
         this.spec.fields.filter(f=>f.name==='title' && f.custom).length>0
     },
-    filtered_items: function() {
-      console.log('VTB filtered_items', this.items, this.filter)
-
-      if(this.filter) {
-        return this.items.filter(
-          item => 
-            Object.entries(this.filter).reduce(
-              (o,e)=>(o&&item[e[0]]===e[1]),true)
-        )
-      }
-      else {
-        return this.items
-      }
-    },
     headers: function() {
       return this.spec.ux.headers
     }
@@ -305,6 +313,50 @@ export default {
         item.$edit = false
         return item
       })
+
+      this.update_items()
+    },
+    close_items: function() {
+      let index = 0
+      this.items.forEach(x => {
+        x.$index = index++
+        x.$edit = false
+        if(''===x.title && x.$last) {
+          x.title = x.$last.title
+        }
+      })
+    },
+    update_items: function() {
+      this.close_items()
+
+      if( this.spec.ux.open_rows ) {
+        var empty = this.items.find(x=>x.$empty)
+        var adder = this.items.find(x=>x.$adder)
+        var len = Math.max(
+          this.spec.ux.open_rows,
+          this.items.length+
+            (null==empty&&null==adder?1:0))
+        while(this.items.length < len) {
+          this.items.push({
+            ...this.new_item(),
+            $edit: false,
+            $adder: false,
+            $empty: true,
+            title: ''
+          })
+        }
+      }
+
+      if( this.spec.ux.add_last ) {
+        var adder = this.items.find(x=>x.$adder)
+        if(null == adder) {
+          adder = this.items.find(x=>x.$empty)
+          console.log('ADDER',adder)
+          adder.$adder = true
+          adder.$empty = false
+          adder.title = this.spec.ux.add_last_text
+        }
+      }
     },
     edit_slot: function(field) {
       return 'edit.'+field.name
@@ -367,14 +419,36 @@ export default {
       if(this.spec.item.title_edit) {
         event.stopPropagation()
         event.preventDefault()
-        item.$edit=true
+        item.$last={title:item.title}
+
+        this.close_items()
+        
+        if(item.$adder && item.title === this.spec.ux.add_last_text) {
+          item.title = ''
+        }
+
+        item.$edit = true
+
+        setTimeout(() => {
+          // console.log(this.$refs)
+          var input_el = this.$refs['item'+item.$index]
+          window.foo = input_el[0]
+          if(input_el[0]) {
+            input_el[0].$el.querySelector('input').focus()
+          }
+        },100)
       }
       else {
         this.act_item(item)
       }
     },
     item_title_save: function(item) {
-      item.$edit = false
+      if('' !== item.title) {
+        item.$edit = false
+        item.$adder = false
+        item.$empty = false
+        this.update_items()
+      }
     },
     make_text_style: function(field) {
       let style = {}
@@ -385,6 +459,13 @@ export default {
     },
     title_toggle: function() {
       this.list_visible = !this.list_visible
+    },
+    list_item_classes (item) {
+      return [
+        item.$edit ? 'vxo-task-box-item-state-edit' : '',
+        item.$adder ? 'vxo-task-box-item-state-adder' : '',
+        item.$new ? 'vxo-task-box-item-state-new' : '',
+      ].join(' ')
     }
   }
 }
@@ -471,6 +552,8 @@ function init_spec(spec) {
     },
     toolbar_btn_class: '',
     edit_dialog: true,
+    add_last: false,
+    add_last_text: 'Add task...',
     ...spec.ux
   }
 

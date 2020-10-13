@@ -18,6 +18,13 @@
 
   
   <vxo-task-box
+    :spec="test.taskbox1.spec"
+    v-model="test.taskbox1.items"
+    >
+  </vxo-task-box>
+
+
+  <vxo-task-box
     :spec="test.taskbox0.spec"
     v-model="test.taskbox0.items"
     >
@@ -33,7 +40,6 @@
     </template>
   </vxo-task-box>
 
-  <foo-bar />
   
   <hr>
   <br>
@@ -82,6 +88,33 @@ export default {
   data: function() {
     return {
       test: {
+        taskbox1: {
+          spec: {
+            ux: {
+              add_item: false,
+              add_last: true,
+              open_rows: 3
+            }
+          },
+          items: [
+            {
+              title: 'AAA'
+            },
+/*
+            {
+              title: 'BBB'
+            },
+
+            {
+              title: 'CCC'
+            },
+
+            {
+              title: 'DDD'
+            },
+*/
+          ]
+        },
         taskbox0: {
           spec: {
             title: 'Foo',
