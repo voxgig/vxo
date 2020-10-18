@@ -2,7 +2,16 @@
 <v-app>
   <h1>TESTBED</h1>
 
+  <vxo-canary
+    :a="a"
+    :b="b"
+    >
+    </vxo-canary>
 
+  a<input v-model="a" /><br />
+  b.e<input v-model="b.e" /><br />
+  b.f<input v-model="b.f" /><br />
+  
   <!--
   <p style="font-size:1rem">
   9:30: <vxo-time :time="930" /> <br>
@@ -16,7 +25,7 @@
   </p>
   -->
 
-  
+<!--  
   <vxo-task-box
     :spec="test.taskbox1.spec"
     v-model="test.taskbox1.items"
@@ -43,6 +52,7 @@
   
   <hr>
   <br>
+  -->
 
 <!--
   <vxo-slide-select
@@ -87,6 +97,8 @@ export default {
   name: "app",
   data: function() {
     return {
+      a: 'A',
+      b: { e: 'E' },
       test: {
         taskbox1: {
           spec: {
