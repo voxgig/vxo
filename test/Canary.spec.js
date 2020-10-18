@@ -10,7 +10,7 @@ Vue.use(Vuetify)
 describe(def.name, () => {
   it('happy', async () => {
     var props = {
-      b: { e: 'E' }
+      b: { e: 'E' },
     }
 
     var wrapper = make_component({ Vue, mount, def, props })
