@@ -2,6 +2,7 @@
 <v-app>
   <h1>TESTBED</h1>
 
+    <!--
   <vxo-canary
     :a="a"
     :b="b"
@@ -12,7 +13,7 @@
   b.e<input v-model="b.e" /><br />
   b.f<input v-model="b.f" /><br />
   
-  <!--
+
   <p style="font-size:1rem">
   9:30: <vxo-time :time="930" /> <br>
   9:30AM: <vxo-time :time="930" clock="MM"/> <br>
@@ -25,14 +26,14 @@
   </p>
   -->
 
-<!--  
+
   <vxo-task-box
     :spec="test.taskbox1.spec"
     v-model="test.taskbox1.items"
     >
   </vxo-task-box>
 
-
+<!--  
   <vxo-task-box
     :spec="test.taskbox0.spec"
     v-model="test.taskbox0.items"
@@ -105,7 +106,11 @@ export default {
             ux: {
               add_item: false,
               add_last: true,
-              open_rows: 3
+              open_rows: 3,
+
+              keys: {
+                enter_inserts: true
+              }
             }
           },
           items: [
