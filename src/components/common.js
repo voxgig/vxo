@@ -1,7 +1,6 @@
 export default {
   clone: (x) => JSON.parse(JSON.stringify(x)),
-  genid: (p) => ((p=(null===p?'':null==p?'ID':p),
-                  p+Math.random()).substring(p.length)),
+  genid: (p) => ((null===p?'':null==p?'ID':p)+Math.random()).replace(/0\./g,''),
   
   taskbox: {
     field: {

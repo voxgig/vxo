@@ -1,5 +1,9 @@
 <template>
-  <v-card v-bind="spec.card" :class="spec.classes">
+<v-card
+  v-bind="spec.card"
+  :id="spec.id"
+  :class="spec.classes"
+  >
     <v-toolbar
       flat
       dense
@@ -69,17 +73,18 @@
         <v-list-item-content
           v-if="!has_custom_title"
           class="vxo-task-box-item-title vxo-task-box-item-field"
+          @click.stop.prevent="item_title_action($event,item)"
           >
           <v-icon
             left
-            style="max-width:32px"
+            :class="'vxo-task-box-state-icon-'+item.task.state"
             v-if="spec.ux.state && !item.meta.state.empty"
             @click.stop.prevent="change_item_state(item)"
             >{{ item_state_icon(item) }}</v-icon>
 
           <p
             v-if="!item.meta.state.edit && !item.meta.state.empty"
-            @click="item_title_action($event,item)"
+
             >
             {{ item.task.title }}
 
@@ -91,7 +96,7 @@
             </small>
             -->
           </p>
-
+          
           <v-text-field
             outlined
             hide-details
@@ -103,6 +108,22 @@
             :ref="'item'+item.meta.index"
             >
           </v-text-field>
+
+
+          <v-spacer
+            v-if="has_title_editor_link(item)"
+            class="vxo-task-box-title-editor-link vxo-task-box-title-editor-link-spacer"
+            ></v-spacer>
+          <p
+            v-if="has_title_editor_link(item)"
+            class="vxo-task-box-title-editor-link vxo-task-box-title-editor-link-text"
+            @click.stop.prevent="edit_item(item)"
+            >
+            <span>{{ spec.text.title_editor_link }}</span>
+            <v-icon
+              small
+              >{{ spec.icon.editor_link }}</v-icon>
+          </p>          
         </v-list-item-content>
 
 
@@ -140,22 +161,23 @@
 
     
         <v-list-item-icon
-          v-if="spec.ux.actions"
+          v-if="has_ux_actions"
+          class="vxo-task-box-actions"
           >
           <v-icon
-            v-if="!item.meta.state.edit"
+            v-if="spec.ux.actions.remove && !item.meta.state.edit"
             @click="remove_item(item)"
             >{{ spec.icon.remove }}</v-icon>
           <v-icon
-            v-if="!item.meta.state.edit"
+            v-if="spec.ux.actions.edit && !item.meta.state.edit"
             @click="edit_item(item)"
             >{{ spec.icon.edit }}</v-icon>
           <v-icon
-            v-if="item.meta.state.edit"
+            v-if="spec.ux.actions.save && item.meta.state.edit"
             @click="save_item(item)"
             >{{ spec.icon.save }}</v-icon>
           <v-icon
-            v-if="!item.meta.state.edit"
+            v-if="spec.ux.actions.drag && !item.meta.state.edit"
             class="vxo-task-box-handle"
             >{{ spec.icon.drag }}</v-icon>
         </v-list-item-icon>
@@ -177,14 +199,13 @@
       </slot>
     </v-list>
 
-    <!--
     <task-box-editor
       v-model="edit"
       :spec="spec"
-      :task="edit_task"
-      @toggle_status="toggle_status"
-      @update_field="update_field"
-      x-create_task="create_task"
+      :edit="editor_item"
+      @toggle_status="editor_toggle_status"
+      @update_field="editor_update_field"
+      @create_item="editor_create_item"
       >
       <template
         v-for="field in spec.fields"
@@ -199,7 +220,6 @@
         </slot>
       </template>
     </task-box-editor>
-    -->
   </v-card>
 </template>
 
@@ -220,6 +240,21 @@
     }
     > .v-input {
         flex-grow: 1;
+    }
+
+    &:hover {
+        .vxo-task-box-title-editor-link {
+            display: revert;
+
+            &:hover * {
+                cursor: pointer;
+                color: blue;
+            }
+        }
+    }
+    
+    .vxo-task-box-title-editor-link {
+        display: none;
     }
 }
 .vxo-task-box-item-field {
@@ -244,14 +279,14 @@ import Vue from 'vue'
 import { JoiProps, Joi } from 'joiprops'
 
 import Common from './common'
-// import TaskBoxEditor from './TaskBoxEditor.vue'
+import TaskBoxEditor from './TaskBoxEditor.vue'
 
 const { clone, genid } = Common
 
 export default {
   name: 'vxo-task-box',
   components: {
-    // 'task-box-editor': TaskBoxEditor
+    'task-box-editor': TaskBoxEditor
   },
   props: {
     filter: {
@@ -272,6 +307,8 @@ export default {
     JoiProps({
       spec: Joi.object({
 
+        id: Joi.string().default(()=>genid('vxo-task-box-')),
+        
         ux: Joi.object({
 
           title: Joi.object({
@@ -281,16 +318,23 @@ export default {
           }).default(),
 
           state: Joi.boolean().default(true),
-          actions: Joi.boolean().default(true),
           add_item: Joi.boolean().default(true),
           init_list_visible: Joi.boolean().default(true),
           toolbar: Joi.boolean().default(true),
-          edit_dialog: Joi.boolean().default(true),
-          add_last: Joi.boolean().default(false),
-
+          add_last: Joi.boolean().default(false),          
           open_rows: Joi.number().min(0).default(0),
 
+          actions: Joi.object({
+            remove: Joi.boolean().default(true),
+            edit: Joi.boolean().default(true),
+            save: Joi.boolean().default(true),
+            drag: Joi.boolean().default(true),
+          }).default(),
 
+          item: Joi.object({
+            title_editor_link: Joi.boolean().default(false),
+          }).default(),
+          
           keys: Joi.object({
             enter_saves: Joi.boolean().default(true),
             enter_inserts: Joi.boolean().default(false),
@@ -300,6 +344,14 @@ export default {
 
         text: Joi.object({
           add_last: Joi.string().default('Add task...'),
+          title_editor_link: Joi.string().default('Details'),
+          editor: Joi.object({
+            create_task: Joi.string().default('Create task...'),
+            task_state: Joi.object({
+              done: Joi.string().default('Mark not done'),
+              todo: Joi.string().default('Mark done'),
+            }).default()
+          }).default()
         }).default(),
         
         icon: Joi.object({
@@ -307,14 +359,28 @@ export default {
           remove: Joi.string().default('mdi-close-box'),
           drag: Joi.string().default('mdi-apps-box'),
           edit: Joi.string().default('mdi-pencil-box'),
-        }).default()
+          done: Joi.string().default('mdi-check-circle-outline'),
+          todo: Joi.string().default('mdi-circle-outline'),
+          editor_link: Joi.string().default('mdi-chevron-right'),          
+        }).default(),
+
+        /*
+        editor: Joi.object({
+          active: Joi.boolean().default(true),
+        })
+        */
+
+        fields: Joi.array().items(Joi.object({
+          name: Joi.string().required()
+        })).default([{name:'title',label:'Task'}])
+        
       }).unknown().required()
     })
   ],
   data: function() {
     return {
       edit: false,
-      edit_task: {},
+      editor_item: {},
       items: [],
       list_visible: this.spec.ux.init_list_visible
     }
@@ -356,6 +422,10 @@ export default {
     },
     headers: function() {
       return this.spec.ux.headers
+    },
+    has_ux_actions () {
+      let actions = this.spec.ux.actions
+      return Object.keys(actions).reduce((has_any,name)=>has_any||actions[name],false)
     }
   },
   methods: {
@@ -372,6 +442,8 @@ export default {
     norm_items: function(edit_item) {
       let index = 0
       this.items.forEach(item => {
+        if(null == item.task) return;
+
         let is_edit_item = edit_item ? item.meta.mark === edit_item.meta.mark : false
         item.meta.index = index++
         item.meta.state.edit = is_edit_item ? edit_item.meta.mark : false
@@ -380,7 +452,7 @@ export default {
           // Disallow empty titles on existing items
           if(''===item.task.title || null == item.task.title) {
             item.task.title =
-              item.meta.last ? item.last.title : this.spec.text.add_last
+              item.meta.last ? item.meta.last.title : this.spec.text.add_last
           }
         }
       })
@@ -403,6 +475,7 @@ export default {
         x=>[
           x.meta.index,
           JSON.stringify(x.meta.state),
+          x.task.state,
           new String(x.task.title),
         ].join('|')).join('\n'))
     },
@@ -442,10 +515,14 @@ export default {
       this.items.push(this.new_item())
     },
     new_task: function(task) {
-      return null != task ? clone(task) : {
+      let new_task = null != task ? clone(task) : {
         title: '',
         state: 'todo'
       }
+
+      new_task.state = new_task.state || 'todo'
+
+      return new_task
     },
     new_item: function(
       task, // optional initial task data
@@ -463,6 +540,9 @@ export default {
           
           // Item index
           index: meta ? meta.index : 0,
+
+          // Increment when item changes
+          change: meta && null !== meta.change ? meta.change : 0,
           
           // UX state
           state: {
@@ -498,11 +578,9 @@ export default {
     save_item: function(item) {
       item.meta.state.edit = false
     },
-    edit_item: function(item) {
-      if(this.spec.ux.edit_dialog) {
-        this.edit = true
-        this.edit_task = item
-      }
+    edit_item (item) {
+      this.edit = true
+      this.editor_item = item
     },
     act_item: function(item) {
       this.edit_item(item)
@@ -511,31 +589,27 @@ export default {
       return (Math.random()+'').substring(2)
     },
     item_state_icon: function (item) {
-      return this.spec.icon.$state[item.state] || 'mdi-circle-outline'
+      item.task.state = item.task.state || 'todo'
+      let icon = this.spec.icon[item.task.state] || 'mdi-circle-outline'
+      return icon
     },
     change_item_state: function(item) {
-      item.state = this.spec.statemap[item.state] || 'todo'
+      this.$set(item.task, 'state', this.spec.statemap[item.task.state] || 'todo')
+      this.$set(item.meta, 'change',
+                null == item.meta.change ? 0 : item.meta.change++)
     },
 
+    /*
     toggle_status: function() {
       if(this.edit_task) {
         this.change_item_state(this.edit_task)
       }
     },
-    update_field: function({field,item}) {
-      if(this.edit_task) {
-        this.edit_task[field.name] = item[field.name]
-      }
-    },
-
-    /*
-    create_task: function(item) {
-      delete item.$new
-      var new_item = clone(item)
-      this.items = [...this.items,new_item]
-    },
 */
+
     item_title_action: function(event, item) {
+      console.log('VTB item_title_action', item)
+      
       if(this.spec.ux.title.edit) {
         event.stopPropagation()
         event.preventDefault()
@@ -621,12 +695,39 @@ export default {
     },
     list_item_classes (item) {
       return [
+        'vxo-task-box-item',
         item.meta.state.edit ? 'vxo-task-box-item-state-edit' : '',
         item.meta.state.empty ? 'vxo-task-box-item-state-empty' : '',
         item.meta.state.adder ? 'vxo-task-box-item-state-adder' : '',
         item.meta.flags.new ? 'vxo-task-box-item-state-new' : '',
         item.meta.flags.remove ? 'vxo-task-box-item-state-remove' : '',
       ].join(' ')
+    },
+
+    has_title_editor_link (item) {
+      return (
+        !item.meta.state.empty &&
+          !item.meta.state.adder &&
+          this.spec.ux.item.title_editor_link
+      )
+    },
+
+
+    editor_toggle_status: function() {
+      console.log('VTB editor_toggle_status')
+      if(this.editor_item) {
+        this.change_item_state(this.editor_item)
+      }
+    },
+    editor_update_field: function({field,item}) {
+      console.log('VTB editor_update_field', field, item)
+      if(this.editor_item) {
+        this.$set(this.editor_item.task, field.name, item.task[field.name])
+      }
+    },
+    editor_create_item: function(item) {
+      console.log('VTB editor_new_item', item)
+      this.new_item(item)
     }
   }
 }
@@ -636,20 +737,10 @@ function init_spec(spec) {
     ...spec.card
   } 
 
-  spec.dialog = {
-    ...spec.dialog
-  } 
-
   spec.list = {
     ...spec.list
   } 
-  
-  spec.icon.$state = {
-    done: 'mdi-check-circle-outline',
-    todo: 'mdi-circle-outline',
-    ...spec.icon.$state
-  }
-  
+
   spec.classes = {
     'vxo-task-box': true,
     ...spec.classes

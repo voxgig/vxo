@@ -7,26 +7,29 @@
     class="vxo-task-box-editor"
     >
 
+    EDIT {{ item }}
+    
+
     <v-toolbar
       v-if="spec.ux.toolbar"
       dense
       flat
       class="vxo-task-box-toolbar"
       >
+
       <v-btn
-        v-if="!item.$new"
+        v-if="!item.meta.new"
         outlined
-        :class="spec.ux.toolbar_btn_class"
+        class="vxo-task-box-editor-toolbar-btn"
         @click="toggle_status"
-        > {{ spec.ux.toolbar_status_btn_text_map[item.state] }} </v-btn>
+        > {{ spec.text.editor.task_state[item.task.state] }} </v-btn>
 
       <v-btn
-        v-if="item.$new"
+        v-if="item.meta.new"
         outlined
-        :class="spec.ux.toolbar_btn_class"
-        @click="create_task(item)"
-        > Create Task </v-btn>
-
+        class="vxo-task-box-editor-toolbar-btn"
+        @click="create_item(item)"
+        > {{ spec.text.editor.create_task }} </v-btn>
       <v-spacer />
       <v-icon @click="open=false">mdi-close</v-icon>
     </v-toolbar>
@@ -44,19 +47,19 @@
           class="vxo-task-box-editor-item"
           >
           <v-icon
-            v-if="!item[field.name]"
-            @click="item[field.name]=true"
+            v-if="!item.task[field.name]"
+            @click="item.task[field.name]=true"
             >mdi-checkbox-blank</v-icon>
           <v-icon
-            v-if="item[field.name]"
-            @click="item[field.name]=false"
+            v-if="item.task[field.name]"
+            @click="item.task[field.name]=false"
             >mdi-checkbox-marked</v-icon>
         </div>
         
         <v-text-field
           v-if="'string' === field.kind"
-          v-model="item[field.name]"
-          :label="field.label"
+          v-model="item.task[field.name]"
+          :label="field.label || field.name"
           class="vxo-task-box-editor-item"
           :data-field-name="field.name"
           @change="update_field(field,item)"
@@ -72,11 +75,11 @@
           class="vxo-task-box-editor-item"
           v-if="'custom' === field.kind"
           >
-          {{ item[field.name] }}
+          {{ item.task[field.name] }}
         </slot>
 
         <component
-          v-model="item[field.name]"
+          v-model="item.task[field.name]"
           :task="item"
           :field="field"
           :spec="spec"
@@ -126,16 +129,22 @@ export default {
       type: Object,
       required: true
     },
-    task: {
+    edit: {
       type: Object,
-      required: true
+      default: ()=>({
+        task: {},
+        meta: {},
+      })
     },
   },
   data: function() {
     return {
       open: false,
       fields: [],
-      item: {}
+      item: {
+        task: {},
+        meta: {}
+      }
     }
   },  
   created: function() {
@@ -155,11 +164,14 @@ export default {
     spec: function() {
       this.init_spec()
     },
-    task: function() {
-      this.init_task()
+    edit: function() {
+      this.init_edit()
     },
-    'task.state': function() {
-      this.init_task()
+    'edit.meta.change': function() {
+      this.init_edit()
+    },
+    'edit.task.state': function(state) {
+      this.item.task.state = state
     },
   },
   methods: {
@@ -167,9 +179,8 @@ export default {
       this.open = this.value
 
       var spec = this.spec
-
+      console.log('VTBE init fields', spec.fields)
       
-
       var fields = this.fields = []
 
       for(var i = 0; i < spec.fields.length; i++) {
@@ -185,8 +196,10 @@ export default {
         fields.push(field)
       }
     },
-    init_task: function() {
-      this.item = clone(this.task) || {}
+    init_edit: function() {
+      if(this.edit) {
+        this.item = clone(this.edit) || {}
+      }
     },
     toggle_status: function() {
       this.$emit('toggle_status')
@@ -194,8 +207,8 @@ export default {
     update_field: function(field,item) {
       this.$emit('update_field', {field,item})
     },
-    create_task: function(item) {
-      this.$emit('create_task', item)
+    create_item: function(item) {
+      this.$emit('create_item', item)
       this.open = false
     }
   }

@@ -108,10 +108,22 @@ export default {
               add_last: true,
               open_rows: 3,
 
+              item: {
+                title_editor_link: true,
+              },
+              
               keys: {
                 enter_inserts: true
+              },
+
+              actions: {
+                // remove: false
               }
-            }
+            },
+
+            icon: {
+              done: 'mdi-check-circle'
+            },
           },
           items: [
             {
@@ -221,11 +233,30 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .vxo-slide-select-main {
     border:1px solid #333;
 }
 .vxo-slide-select-item-selected {
     background-color: #ccf;
 }
+
+.vxo-task-box-state-icon-done {
+    color: green !important;
+}
+
+.vxo-task-box-item {
+    border: 1px solid gray;
+}
+
+.vxo-task-box-item {
+    &:hover {
+        border-color: blue;
+    }
+}
+
+.vxo-task-box-actions {
+    order: -1;
+}
+
 </style>
