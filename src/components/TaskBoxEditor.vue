@@ -1,7 +1,7 @@
 <template>
 <v-dialog
   v-model="open"
-  v-bind="spec.dialog"
+  v-bind="spec.vuetify.vdialog"
   >
   <v-card
     class="vxo-task-box-editor"

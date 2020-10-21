@@ -8,6 +8,8 @@
   --vxo-s6: 64px;
   --vxo-s7: 128px;
   --vxo-s8: 256px;
+  --vxo-cd-link: 0,136,255;
+  /* #08F */
 }
 .vxo-task-box-editor {
   padding: var(--vxo-s4);
@@ -50,7 +52,7 @@
 }
 .vxo-task-box-item-title:hover .vxo-task-box-title-editor-link:hover * {
   cursor: pointer;
-  color: #067DFF;
+  color: rgb(var(--vxo-cd-link));
 }
 .vxo-task-box-item-title .vxo-task-box-title-editor-link {
   display: none;

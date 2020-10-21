@@ -275,7 +275,7 @@
 // item: { task, meta }
 
 //import Vue from 'vue'
-import { JoiProps, Joi, JT, JF, JB, JS, JN, JO, JA } from 'joiprops'
+import { JoiProps, Joi, JT, JF, JB, JS, JN, JO, JA, JOu } from 'joiprops'
 
 import Common from './common'
 import TaskBoxEditor from './TaskBoxEditor.vue'
@@ -361,16 +361,24 @@ const joiprops = JoiProps({
       label: JS().allow(null),
     })).default([{name:'title',label:'Task'}]),
 
+
     vuetify: JO({
-      vcard: JO({
+      vcard: JOu({
+        flat: JT,
+        dense: JT,
       }),
-      vtoolbar: JO({
+      vtoolbar: JOu({
         flat: JT,
         dense: JT
       }),
-      vlist: JO({
+      vlist: JOu({
+        flat: JT,
+        dense: JT,
+      }),
+      vdialog: JOu({
       }),
     }),
+
 
     classes: JO({
       'vxo-task-box': JT,
@@ -387,7 +395,7 @@ const joiprops = JoiProps({
     custom: JO({
       title: JS()
     })
-    
+
   }).unknown().required()
 })
 
