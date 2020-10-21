@@ -423,8 +423,6 @@ export default {
   mixins:[joiprops],
   data () {
     return {
-      foo: {toolbar: {flat:true}},
-      
       edit: false,
       editor_item: {},
       items: [],
@@ -675,7 +673,6 @@ export default {
     item_title_edit_focus (item) {
      this.$nextTick(() => {
         var input_el = this.$refs['item'+item.meta.index]
-        window.foo = input_el[0]
         if(input_el[0]) {
           input_el[0].$el.querySelector('input').focus()
         }
