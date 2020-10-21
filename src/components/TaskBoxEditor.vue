@@ -7,9 +7,6 @@
     class="vxo-task-box-editor"
     >
 
-    EDIT {{ item }}
-    
-
     <v-toolbar
       v-if="spec.ux.toolbar"
       dense
@@ -57,7 +54,7 @@
         </div>
         
         <v-text-field
-          v-if="'string' === field.kind"
+          v-if="'string' === field.kind && ' '!=field.name"
           v-model="item.task[field.name]"
           :label="field.label || field.name"
           class="vxo-task-box-editor-item"
@@ -67,6 +64,7 @@
           >
         </v-text-field>
 
+        <!--
         <slot
           :task="item"
           :field="field"
@@ -78,6 +76,7 @@
           {{ item.task[field.name] }}
         </slot>
 
+        
         <component
           v-model="item.task[field.name]"
           :task="item"
@@ -87,7 +86,8 @@
           :is="field.component"
           class="vxo-task-box-editor-item"
           ></component>
-
+        -->
+        
       </li>
     </ul>
   </v-card>

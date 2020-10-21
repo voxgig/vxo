@@ -52,7 +52,7 @@
             :style="header.styling"
             >{{ header.title }}</v-list-item-content>
           <v-spacer
-            v-if="spec.ux.actions"
+            v-if="has_ux_actions"
             />
         </v-list-item>
 
@@ -140,7 +140,7 @@
             v-if="field.kind=='text'"
             :style="make_text_style(field)"
             >
-            {{ item[field.name] }}
+            {{ item.task[field.name] }}
           </span>
 
           <slot
@@ -149,14 +149,14 @@
             :name="'custom.'+field.name"
             v-if="field.kind=='custom'"
             >
-            {{ item[field.name] }}
+            {{ item.task[field.name] }}
           </slot>
 
         </v-list-item-content>
 
     
         <v-spacer
-          v-if="spec.ux.actions"
+          v-if="has_ux_actions"
           />
 
     
@@ -213,7 +213,7 @@
         >
         <slot
           :name="'edit.'+field.name"
-          :task="edit_task"
+          :task="editor_item"
           :field="field"
           :spec="spec"
           >
@@ -248,7 +248,7 @@
 
             &:hover * {
                 cursor: pointer;
-                color: blue;
+                color: #067DFF;
             }
         }
     }
@@ -275,7 +275,7 @@
 // NOTE:
 // item: { task, meta }
 
-import Vue from 'vue'
+//import Vue from 'vue'
 import { JoiProps, Joi } from 'joiprops'
 
 import Common from './common'
@@ -311,6 +311,13 @@ export default {
         
         ux: Joi.object({
 
+          headers: Joi.array().items(Joi.object({
+            title: Joi.string(),
+            name: Joi.string(),
+            kind: Joi.string(),
+            styling: Joi.string()
+          })).default([]),
+          
           title: Joi.object({
             edit: Joi.boolean().default(true),
             title_count: Joi.boolean().default(false),
@@ -343,6 +350,7 @@ export default {
         }).default(),
 
         text: Joi.object({
+          add_item: Joi.string().default('Add task...'),
           add_last: Joi.string().default('Add task...'),
           title_editor_link: Joi.string().default('Details'),
           editor: Joi.object({
@@ -371,7 +379,9 @@ export default {
         */
 
         fields: Joi.array().items(Joi.object({
-          name: Joi.string().required()
+          name: Joi.string().required(),
+          kind: Joi.string(),
+          label: Joi.string().allow(null),
         })).default([{name:'title',label:'Task'}])
         
       }).unknown().required()
@@ -589,9 +599,11 @@ export default {
       return (Math.random()+'').substring(2)
     },
     item_state_icon: function (item) {
-      item.task.state = item.task.state || 'todo'
-      let icon = this.spec.icon[item.task.state] || 'mdi-circle-outline'
-      return icon
+      if(item && item.task && this.spec.icon ) {
+        item.task.state = item.task.state || 'todo'
+        let icon = this.spec.icon[item.task.state] || 'mdi-circle-outline'
+        return icon
+      }
     },
     change_item_state: function(item) {
       this.$set(item.task, 'state', this.spec.statemap[item.task.state] || 'todo')
@@ -773,6 +785,8 @@ function init_spec(spec) {
     ...spec.custom
   } 
 
+  console.log('VTB spec', spec)
+  
 }
 </script>
 

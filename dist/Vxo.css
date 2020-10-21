@@ -5,6 +5,9 @@
   --vxo-s3: 8px;
   --vxo-s4: 16px;
   --vxo-s5: 32px;
+  --vxo-s6: 64px;
+  --vxo-s7: 128px;
+  --vxo-s8: 256px;
 }
 .vxo-task-box-editor {
   padding: var(--vxo-s4);
@@ -41,6 +44,16 @@
   -webkit-box-flex: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
+}
+.vxo-task-box-item-title:hover .vxo-task-box-title-editor-link {
+  display: revert;
+}
+.vxo-task-box-item-title:hover .vxo-task-box-title-editor-link:hover * {
+  cursor: pointer;
+  color: #067DFF;
+}
+.vxo-task-box-item-title .vxo-task-box-title-editor-link {
+  display: none;
 }
 .vxo-task-box-item-field:first-of-type {
   min-width: 50%;
