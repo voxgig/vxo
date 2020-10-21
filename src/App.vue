@@ -103,6 +103,13 @@ export default {
       test: {
         taskbox1: {
           spec: {
+            title: 'Title Text',
+            
+            vuetify: {
+              vtoolbar: {
+                flat: false,
+              }
+            },
             ux: {
               add_item: false,
               add_last: true,
@@ -124,6 +131,7 @@ export default {
             icon: {
               done: 'mdi-check-circle'
             },
+
           },
           items: [
             {

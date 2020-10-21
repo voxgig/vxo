@@ -1,75 +1,74 @@
 <template>
 <v-card
-  v-bind="spec.card"
+  v-bind="spec.vuetify.vcard"
   :id="spec.id"
   :class="spec.classes"
   >
-    <v-toolbar
-      flat
-      dense
-      >
-      <h3
-        v-if="null!=spec.title"
-        @click="title_toggle"
-        >
-        {{ spec.title }}
-        <span
-          v-if="spec.ux.title_count"
-          >({{ items.length }})</span>
-      </h3>
 
-      <v-spacer
-        v-if="spec.tool.add.active"
-        ></v-spacer>
+  <v-toolbar
+    v-bind="spec.vuetify.vtoolbar"
+    >
+    <h3
+      v-if="null!=spec.title"
+      @click="title_toggle"
+      >
+      {{ spec.title }}
+      <span
+        v-if="spec.ux.title_count"
+        >({{ items.length }})</span>
+    </h3>
+    
+    <v-spacer
+      v-if="spec.tool.add.active"
+      ></v-spacer>
+    
+    <v-btn
+      v-if="spec.tool.add.active"
+      v-bind="spec.tool.add.bind"
+      @click.stop.prevent="add_item"
+      >
+      {{ spec.tool.add.text }}
+    </v-btn>
+  </v-toolbar>
+  
+  <v-list
+    v-bind="spec.vuetify.vlist"
+    v-if="list_visible"
+    class="vxo-task-box-items"
+    >
+    
+    <slot
+      name="header"
+      v-if="spec.ux.headers"
+      >
+      <v-list-item
+        class="vxo-task-box-item-headers"
+        >
+        <v-list-item-content
+          v-for="(header,index) in headers"
+          :key="index"
+          class="vxo-task-box-item-field vxo-task-box-item-header"
+          :style="header.styling"
+          >{{ header.title }}</v-list-item-content>
+        <v-spacer
+          v-if="has_ux_actions"
+          />
+      </v-list-item>
       
-      <v-btn
-        v-if="spec.tool.add.active"
-        v-bind="spec.tool.add.props"
-        @click.stop.prevent="add_item"
-        >
-        {{ spec.tool.add.text }}
-        </v-btn>
-    </v-toolbar>
-
-
-    <v-list
-      v-bind="spec.list"
-      v-if="list_visible"
-      class="vxo-task-box-items"
+    </slot>
+    
+    
+    <draggable
+      v-model="items"
+      handle=".vxo-task-box-handle"
       >
-
-      <slot
-        name="header"
-        v-if="spec.ux.headers"
-        >
-        <v-list-item
-          class="vxo-task-box-item-headers"
-          >
-          <v-list-item-content
-            v-for="(header,index) in headers"
-            :key="index"
-            class="vxo-task-box-item-field vxo-task-box-item-header"
-            :style="header.styling"
-            >{{ header.title }}</v-list-item-content>
-          <v-spacer
-            v-if="has_ux_actions"
-            />
-        </v-list-item>
-
-      </slot>
-
-
-      <draggable
-        v-model="items"
-        handle=".vxo-task-box-handle"
-        >
       <v-list-item
         v-for="item in items"
         :key="item.meta.mark"
         v-if="!item.meta.flags.remove"
         :class="list_item_classes(item)"
         >
-
+        
         <v-list-item-content
           v-if="!has_custom_title"
           class="vxo-task-box-item-title vxo-task-box-item-field"
@@ -81,20 +80,20 @@
             v-if="spec.ux.state && !item.meta.state.empty"
             @click.stop.prevent="change_item_state(item)"
             >{{ item_state_icon(item) }}</v-icon>
-
+          
           <p
             v-if="!item.meta.state.edit && !item.meta.state.empty"
-
+            
             >
             {{ item.task.title }}
-
+            
             <!--
-            <small>
-              adder: {{ item.meta.state.adder }}
-              edit: {{ item.meta.state.edit }}
-              empty: {{ item.meta.state.empty }}
-            </small>
-            -->
+                <small>
+                  adder: {{ item.meta.state.adder }}
+                  edit: {{ item.meta.state.edit }}
+                  empty: {{ item.meta.state.empty }}
+                </small>
+                -->
           </p>
           
           <v-text-field
@@ -108,8 +107,8 @@
             :ref="'item'+item.meta.index"
             >
           </v-text-field>
-
-
+          
+          
           <v-spacer
             v-if="has_title_editor_link(item)"
             class="vxo-task-box-title-editor-link vxo-task-box-title-editor-link-spacer"
@@ -125,8 +124,8 @@
               >{{ spec.icon.editor_link }}</v-icon>
           </p>          
         </v-list-item-content>
-
-
+        
+        
         <v-list-item-content
           v-for="field in field_list"
           :key="field.name"
@@ -135,14 +134,14 @@
           :data-field-name="field.name"
           @click="act_item(item)"
           >
-
+          
           <span
             v-if="field.kind=='text'"
             :style="make_text_style(field)"
             >
             {{ item.task[field.name] }}
           </span>
-
+          
           <slot
             :item="item"
             :field="field"
@@ -151,15 +150,15 @@
             >
             {{ item.task[field.name] }}
           </slot>
-
+          
         </v-list-item-content>
-
-    
+        
+        
         <v-spacer
           v-if="has_ux_actions"
           />
-
-    
+        
+        
         <v-list-item-icon
           v-if="has_ux_actions"
           class="vxo-task-box-actions"
@@ -181,46 +180,46 @@
             class="vxo-task-box-handle"
             >{{ spec.icon.drag }}</v-icon>
         </v-list-item-icon>
-
-    
+        
+        
       </v-list-item>
-      </draggable>
-
-      <slot
-        name="footer"
-        :add_item="add_item"
-        v-if="spec.ux.add_item"
-        >
-        <v-list-item>
-          <v-btn
-            @click="add_item"
-            >{{ spec.text.add_item }}</v-btn>
-        </v-list-item>
-      </slot>
-    </v-list>
-
-    <task-box-editor
-      v-model="edit"
-      :spec="spec"
-      :edit="editor_item"
-      @toggle_status="editor_toggle_status"
-      @update_field="editor_update_field"
-      @create_item="editor_create_item"
+    </draggable>
+    
+    <slot
+      name="footer"
+      :add_item="add_item"
+      v-if="spec.ux.add_item"
       >
-      <template
-        v-for="field in spec.fields"
-        v-slot:[edit_slot(field)]
+      <v-list-item>
+        <v-btn
+          @click="add_item"
+          >{{ spec.text.add_item }}</v-btn>
+      </v-list-item>
+    </slot>
+  </v-list>
+  
+  <task-box-editor
+    v-model="edit"
+    :spec="spec"
+    :edit="editor_item"
+    @toggle_status="editor_toggle_status"
+    @update_field="editor_update_field"
+    @create_item="editor_create_item"
+    >
+    <template
+      v-for="field in spec.fields"
+      v-slot:[edit_slot(field)]
+      >
+      <slot
+        :name="'edit.'+field.name"
+        :task="editor_item"
+        :field="field"
+        :spec="spec"
         >
-        <slot
-          :name="'edit.'+field.name"
-          :task="editor_item"
-          :field="field"
-          :spec="spec"
-          >
-        </slot>
-      </template>
-    </task-box-editor>
-  </v-card>
+      </slot>
+    </template>
+  </task-box-editor>
+</v-card>
 </template>
 
 <style lang="scss">
@@ -248,7 +247,7 @@
 
             &:hover * {
                 cursor: pointer;
-                color: #067DFF;
+                color: rgb(var(--vxo-cd-link));
             }
         }
     }
@@ -276,12 +275,122 @@
 // item: { task, meta }
 
 //import Vue from 'vue'
-import { JoiProps, Joi } from 'joiprops'
+import { JoiProps, Joi, JT, JF, JB, JS, JN, JO, JA } from 'joiprops'
 
 import Common from './common'
 import TaskBoxEditor from './TaskBoxEditor.vue'
 
 const { clone, genid } = Common
+
+const joiprops = JoiProps({
+  spec: JO({
+
+    id: JS().default(()=>genid('vxo-task-box-')),
+
+    statemap: JO({
+      done: JS('todo'),
+      todo: JS('done'),
+    }),
+    
+    ux: JO({
+      
+      headers: JA(JO({
+        title: JS(),
+        name: JS(),
+        kind: JS(),
+        styling: JS(),
+      })),
+      
+      title: JO({
+        edit: JT,
+        title_count: JF,
+        title_toggle: JT,
+      }),
+      
+      state: JT,
+      add_item: JT,
+      init_list_visible: JT,
+      toolbar: JT,
+      add_last: JF,          
+      open_rows: JN(0).min(0),
+      
+      actions: JO({
+        remove: JT,
+        edit: JT,
+        save: JT,
+        drag: JT,
+      }),
+      
+      item: JO({
+        title_editor_link: JF,
+      }),
+      
+      keys: JO({
+        enter_saves: JT,
+        enter_inserts: JF,
+        tab_saves: JT,
+      }),
+    }),
+    
+    text: JO({
+      add_item: JS('Add task...'),
+      add_last: JS('Add task...'),
+      title_editor_link: JS('Details'),
+      editor: JO({
+        create_task: JS('Create task...'),
+        task_state: JO({
+          done: JS('Mark not done'),
+          todo: JS('Mark done'),
+        }),
+      }),
+    }),
+    
+    icon: JO({
+      save: JS('mdi-checkbox-marked'),
+      remove: JS('mdi-close-box'),
+      drag: JS('mdi-apps-box'),
+      edit: JS('mdi-pencil-box'),
+      done: JS('mdi-check-circle-outline'),
+      todo: JS('mdi-circle-outline'),
+      editor_link: JS('mdi-chevron-right'),          
+    }),
+    
+    fields: JA().items(JO({
+      name: JS().required(),
+      kind: JS(),
+      label: JS().allow(null),
+    })).default([{name:'title',label:'Task'}]),
+
+    vuetify: JO({
+      vcard: JO({
+      }),
+      vtoolbar: JO({
+        flat: JT,
+        dense: JT
+      }),
+      vlist: JO({
+      }),
+    }),
+
+    classes: JO({
+      'vxo-task-box': JT,
+    }),
+
+    tool: JO({
+      add: JO({
+        active: JF,
+        text: JS('Add task'),
+        bind: JO()
+      })
+    }),
+
+    custom: JO({
+      title: JS()
+    })
+    
+  }).unknown().required()
+})
+
 
 export default {
   name: 'vxo-task-box',
@@ -303,92 +412,11 @@ export default {
       })
     },
   },
-  mixins:[
-    JoiProps({
-      spec: Joi.object({
-
-        id: Joi.string().default(()=>genid('vxo-task-box-')),
-        
-        ux: Joi.object({
-
-          headers: Joi.array().items(Joi.object({
-            title: Joi.string(),
-            name: Joi.string(),
-            kind: Joi.string(),
-            styling: Joi.string()
-          })).default([]),
-          
-          title: Joi.object({
-            edit: Joi.boolean().default(true),
-            title_count: Joi.boolean().default(false),
-            title_toggle: Joi.boolean().default(true),
-          }).default(),
-
-          state: Joi.boolean().default(true),
-          add_item: Joi.boolean().default(true),
-          init_list_visible: Joi.boolean().default(true),
-          toolbar: Joi.boolean().default(true),
-          add_last: Joi.boolean().default(false),          
-          open_rows: Joi.number().min(0).default(0),
-
-          actions: Joi.object({
-            remove: Joi.boolean().default(true),
-            edit: Joi.boolean().default(true),
-            save: Joi.boolean().default(true),
-            drag: Joi.boolean().default(true),
-          }).default(),
-
-          item: Joi.object({
-            title_editor_link: Joi.boolean().default(false),
-          }).default(),
-          
-          keys: Joi.object({
-            enter_saves: Joi.boolean().default(true),
-            enter_inserts: Joi.boolean().default(false),
-            tab_saves: Joi.boolean().default(true),
-          }).default(),
-        }).default(),
-
-        text: Joi.object({
-          add_item: Joi.string().default('Add task...'),
-          add_last: Joi.string().default('Add task...'),
-          title_editor_link: Joi.string().default('Details'),
-          editor: Joi.object({
-            create_task: Joi.string().default('Create task...'),
-            task_state: Joi.object({
-              done: Joi.string().default('Mark not done'),
-              todo: Joi.string().default('Mark done'),
-            }).default()
-          }).default()
-        }).default(),
-        
-        icon: Joi.object({
-          save: Joi.string().default('mdi-checkbox-marked'),
-          remove: Joi.string().default('mdi-close-box'),
-          drag: Joi.string().default('mdi-apps-box'),
-          edit: Joi.string().default('mdi-pencil-box'),
-          done: Joi.string().default('mdi-check-circle-outline'),
-          todo: Joi.string().default('mdi-circle-outline'),
-          editor_link: Joi.string().default('mdi-chevron-right'),          
-        }).default(),
-
-        /*
-        editor: Joi.object({
-          active: Joi.boolean().default(true),
-        })
-        */
-
-        fields: Joi.array().items(Joi.object({
-          name: Joi.string().required(),
-          kind: Joi.string(),
-          label: Joi.string().allow(null),
-        })).default([{name:'title',label:'Task'}])
-        
-      }).unknown().required()
-    })
-  ],
-  data: function() {
+  mixins:[joiprops],
+  data () {
     return {
+      foo: {toolbar: {flat:true}},
+      
       edit: false,
       editor_item: {},
       items: [],
@@ -396,17 +424,11 @@ export default {
     }
   },
   
-  beforeCreate: function() {
-    var spec = this.$options.propsData.spec
-    init_spec(spec)
-  },
-  created: function() {
+  created () {
+    window.vtb = this
     this.init()
   },
   watch: {
-    spec: function(val) {
-      init_spec(val)
-    },
     'trigger.new_task': function(new_task) {
       // TODO
       /*
@@ -417,20 +439,20 @@ export default {
       this.edit_item(new_item)
       */
     },
-    value: function() {
+    value () {
       this.init()
     }
   },
   computed: {
-    field_list: function() {
+    field_list () {
       var fields = this.spec.fields.filter(f=>f.name!=='title') 
       return fields
     },
-    has_custom_title: function() {
+    has_custom_title () {
       return this.spec.custom.title ||
         this.spec.fields.filter(f=>f.name==='title' && f.custom).length>0
     },
-    headers: function() {
+    headers () {
       return this.spec.ux.headers
     },
     has_ux_actions () {
@@ -439,7 +461,7 @@ export default {
     }
   },
   methods: {
-    init: function() {
+    init () {
       let index = 0
       this.items = [...this.value||[]].map(task=>{
         return this.new_item(task,{index: index++})
@@ -480,8 +502,8 @@ export default {
       return new_item
     },
 
-    print_items: function(note) {
-      console.log('VTB print_items', note, '\n'+this.items.map(
+    print_items (note) {
+      console.log('VOXGIG TaskBox', this.spec.id, note, '\n'+this.items.map(
         x=>[
           x.meta.index,
           JSON.stringify(x.meta.state),
@@ -490,7 +512,7 @@ export default {
         ].join('|')).join('\n'))
     },
     
-    update_items: function() {
+    update_items () {
       this.norm_items()
 
       if( this.spec.ux.open_rows ) {
@@ -521,7 +543,7 @@ export default {
     edit_slot: function(field) {
       return 'edit.'+field.name
     },
-    add_item: function() {
+    add_item () {
       this.items.push(this.new_item())
     },
     new_task: function(task) {
@@ -595,7 +617,7 @@ export default {
     act_item: function(item) {
       this.edit_item(item)
     },
-    make_id: function() {
+    make_id () {
       return (Math.random()+'').substring(2)
     },
     item_state_icon: function (item) {
@@ -612,7 +634,7 @@ export default {
     },
 
     /*
-    toggle_status: function() {
+    toggle_status () {
       if(this.edit_task) {
         this.change_item_state(this.edit_task)
       }
@@ -620,8 +642,6 @@ export default {
 */
 
     item_title_action: function(event, item) {
-      console.log('VTB item_title_action', item)
-      
       if(this.spec.ux.title.edit) {
         event.stopPropagation()
         event.preventDefault()
@@ -645,7 +665,7 @@ export default {
     },
 
     item_title_edit_focus (item) {
-      Vue.nextTick(() => {
+     this.$nextTick(() => {
         var input_el = this.$refs['item'+item.meta.index]
         window.foo = input_el[0]
         if(input_el[0]) {
@@ -702,7 +722,7 @@ export default {
       }
       return style
     },
-    title_toggle: function() {
+    title_toggle () {
       this.list_visible = !this.list_visible
     },
     list_item_classes (item) {
@@ -725,68 +745,20 @@ export default {
     },
 
 
-    editor_toggle_status: function() {
-      console.log('VTB editor_toggle_status')
+    editor_toggle_status () {
       if(this.editor_item) {
         this.change_item_state(this.editor_item)
       }
     },
     editor_update_field: function({field,item}) {
-      console.log('VTB editor_update_field', field, item)
       if(this.editor_item) {
         this.$set(this.editor_item.task, field.name, item.task[field.name])
       }
     },
     editor_create_item: function(item) {
-      console.log('VTB editor_new_item', item)
       this.new_item(item)
     }
   }
-}
-
-function init_spec(spec) {
-  spec.card = {
-    ...spec.card
-  } 
-
-  spec.list = {
-    ...spec.list
-  } 
-
-  spec.classes = {
-    'vxo-task-box': true,
-    ...spec.classes
-  } 
-  
-  spec.statemap = {
-    done: 'todo',
-    todo: 'done',
-    ...spec.statemap
-  }
-  
-  spec.fields = [
-    ...(spec.fields||[])
-  ]
-
-
-  spec.tool = spec.tool || {}
-
-  spec.tool.add = {
-    active: false,
-    text: 'Add Item',
-    ...spec.tool.add
-  }
-
-  spec.tool.add.props = {
-    ...spec.tool.add.props
-  }
-
-  spec.custom = {
-    ...spec.custom
-  } 
-
-  console.log('VTB spec', spec)
-  
 }
 </script>
 

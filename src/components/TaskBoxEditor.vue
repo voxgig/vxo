@@ -179,8 +179,6 @@ export default {
       this.open = this.value
 
       var spec = this.spec
-      console.log('VTBE init fields', spec.fields)
-      
       var fields = this.fields = []
 
       for(var i = 0; i < spec.fields.length; i++) {
