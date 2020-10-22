@@ -137,9 +137,9 @@ export default {
             {
               title: 'AAA'
             },
-/*
+
             {
-              title: 'BBB'
+              title: 'BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB '
             },
 
             {
@@ -149,7 +149,7 @@ export default {
             {
               title: 'DDD'
             },
-*/
+
           ]
         },
         taskbox0: {

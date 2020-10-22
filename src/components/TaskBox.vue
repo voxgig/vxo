@@ -83,7 +83,7 @@
           
           <p
             v-if="!item.meta.state.edit && !item.meta.state.empty"
-            
+            style="flex-grow: 2;"
             >
             {{ item.task.title }}
             
@@ -108,12 +108,14 @@
             >
           </v-text-field>
           
-          
+<!--          
           <v-spacer
             v-if="has_title_editor_link(item)"
             class="vxo-task-box-title-editor-link vxo-task-box-title-editor-link-spacer"
             ></v-spacer>
+-->
           <p
+            style="align-self:right;"
             v-if="has_title_editor_link(item)"
             class="vxo-task-box-title-editor-link vxo-task-box-title-editor-link-text"
             @click.stop.prevent="edit_item(item)"
@@ -232,6 +234,7 @@
 .vxo-task-box-item-title {
     min-width: 50%;
     display: flex;
+    flex-wrap: nowrap !important;
     overflow-x: scroll;
     > * {
         margin: 4px !important;
@@ -244,10 +247,12 @@
     &:hover {
         .vxo-task-box-title-editor-link {
             display: revert;
+            min-width: 5rem;
+            overflow-x: hidden;
 
             &:hover * {
                 cursor: pointer;
-                color: rgb(var(--vxo-cd-link));
+                color: rgb(var(--vxo-cd-link)) !important;
             }
         }
     }
@@ -435,7 +440,7 @@ export default {
     this.init()
   },
   watch: {
-    'trigger.new_task': function(new_task) {
+    'trigger.new_task' (new_task) {
       // TODO
       /*
       var new_item = clone(new_task)
@@ -477,7 +482,7 @@ export default {
     },
 
     
-    norm_items: function(edit_item) {
+    norm_items (edit_item) {
       let index = 0
       this.items.forEach(item => {
         if(null == item.task) return;
@@ -495,7 +500,7 @@ export default {
         }
       })
 
-      this.print_items('norm')
+      // this.print_items('norm')
     },
 
     append_item(task,meta,after_item) {
@@ -544,15 +549,15 @@ export default {
         }
       }
 
-      this.print_items('update')
+      // this.print_items('update')
     },
-    edit_slot: function(field) {
+    edit_slot (field) {
       return 'edit.'+field.name
     },
     add_item () {
       this.items.push(this.new_item())
     },
-    new_task: function(task) {
+    new_task (task) {
       let new_task = null != task ? clone(task) : {
         title: '',
         state: 'todo'
@@ -562,7 +567,7 @@ export default {
 
       return new_task
     },
-    new_item: function(
+    new_item (
       task, // optional initial task data
       meta   // optional initial meta data
     ) {
@@ -609,45 +614,38 @@ export default {
       
       return new_item
     },
-    remove_item: function(item) {
+    remove_item (item) {
       item.meta.flags.remove = true
       this.$forceUpdate()
     },
-    save_item: function(item) {
+    save_item (item) {
       item.meta.state.edit = false
     },
     edit_item (item) {
       this.edit = true
       this.editor_item = item
     },
-    act_item: function(item) {
+    act_item (item) {
       this.edit_item(item)
     },
     make_id () {
       return (Math.random()+'').substring(2)
     },
-    item_state_icon: function (item) {
+    item_state_icon (item) {
       if(item && item.task && this.spec.icon ) {
         item.task.state = item.task.state || 'todo'
         let icon = this.spec.icon[item.task.state] || 'mdi-circle-outline'
         return icon
       }
     },
-    change_item_state: function(item) {
+    change_item_state (item) {
       this.$set(item.task, 'state', this.spec.statemap[item.task.state] || 'todo')
       this.$set(item.meta, 'change',
                 null == item.meta.change ? 0 : item.meta.change++)
+      this.$emit('state', clone(item))
     },
 
-    /*
-    toggle_status () {
-      if(this.edit_task) {
-        this.change_item_state(this.edit_task)
-      }
-    },
-*/
-
-    item_title_action: function(event, item) {
+    item_title_action (event, item) {
       if(this.spec.ux.title.edit) {
         event.stopPropagation()
         event.preventDefault()
@@ -679,7 +677,7 @@ export default {
       })
     },
     
-    item_title_key: function(keyname, item) {
+    item_title_key (keyname, item) {
       if('esc' === keyname ) {
         item.meta.state.edit = false
 
@@ -720,7 +718,7 @@ export default {
       }
     },
     
-    make_text_style: function(field) {
+    make_text_style (field) {
       let style = {}
       if(field.color) {
         style.color = field.color
@@ -755,12 +753,12 @@ export default {
         this.change_item_state(this.editor_item)
       }
     },
-    editor_update_field: function({field,item}) {
+    editor_update_field ({field,item}) {
       if(this.editor_item) {
         this.$set(this.editor_item.task, field.name, item.task[field.name])
       }
     },
-    editor_create_item: function(item) {
+    editor_create_item (item) {
       this.new_item(item)
     }
   }
