@@ -6,6 +6,7 @@
   >
 
   <v-toolbar
+    v-if="null!=spec.title"
     v-bind="spec.vuetify.vtoolbar"
     >
     <h3
