@@ -5,6 +5,7 @@
   >
   <v-card
     class="vxo-task-box-editor"
+    style="background-color:white"
     >
 
     <v-toolbar
@@ -56,27 +57,27 @@
         <v-text-field
           v-if="'string' === field.kind && ' '!=field.name"
           v-model="item.task[field.name]"
-          :label="field.label || field.name"
-          class="vxo-task-box-editor-item"
+          :label="field.show_label ? (field.label || field.name) : null"
+          :class="'vxo-task-box-editor-item vxo-task-box-editor-item-'+field.name"
           :data-field-name="field.name"
           @change="update_field(field,item)"
           placeholder="--"
           >
         </v-text-field>
 
-        <!--
         <slot
-          :task="item"
+          v-if="'custom' === field.kind"
+          :item="item"
           :field="field"
           :spec="spec"
           :name="'edit.'+field.name"
-          class="vxo-task-box-editor-item"
-          v-if="'custom' === field.kind"
+          :class="'vxo-task-box-editor-item vxo-task-box-editor-item-'+field.name"
           >
           {{ item.task[field.name] }}
         </slot>
 
         
+        <!--        
         <component
           v-model="item.task[field.name]"
           :task="item"

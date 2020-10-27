@@ -218,6 +218,7 @@
         :task="editor_item"
         :field="field"
         :spec="spec"
+        :item="editor_item"
         >
       </slot>
     </template>
@@ -365,6 +366,7 @@ const joiprops = JoiProps({
       name: JS().required(),
       kind: JS(),
       label: JS().allow(null),
+      show_label: JT,
     })).default([{name:'title',label:'Task'}]),
 
 

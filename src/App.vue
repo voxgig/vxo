@@ -33,27 +33,32 @@
     >
   </vxo-task-box>
 
-<!--  
+
   <vxo-task-box
     :spec="test.taskbox0.spec"
     v-model="test.taskbox0.items"
     >
+    <!--
     <template v-slot:custom.zed="{ item }">
       ZED {{ item.zed }}
     </template>
-
-    <template v-slot:edit.zed="{task}">
-      APP ZED {{ task }}
+    -->
+    
+    <template v-slot:edit.zed="{item, field, name}">
+      APP ZED {{ item }} {{ field }} {{ name }}
     </template>
+
+    <!--
     <template v-slot:edit.baz="{task, field}">
       APP BAZ {{ task }} {{ field }}
     </template>
+    -->
   </vxo-task-box>
 
   
   <hr>
   <br>
-  -->
+
 
 <!--
   <vxo-slide-select
@@ -165,7 +170,8 @@ export default {
               },
               {
                 name:'bar',
-                kind:'text'
+                kind:'text',
+                show_label: false
               },
               {
                 name:'zed',
@@ -173,12 +179,12 @@ export default {
               },
               {
                 name:'baz',
-                kind:'custom'
+                //kind:'custom'
               },
               {
                 name:'foo',
-                kind:'component',
-                component: 'foo-bar'
+                //kind:'component',
+                //component: 'foo-bar'
               },
             ]
           },
@@ -265,6 +271,10 @@ export default {
 
 .vxo-task-box-actions {
     order: -1;
+}
+
+.vxo-task-box-editor-item-bar {
+    font-size: 24px;
 }
 
 </style>
