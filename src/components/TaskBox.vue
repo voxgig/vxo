@@ -637,6 +637,7 @@ export default {
     remove_item (item) {
       if(item) {
         item.meta.flags.remove = true
+        this.$emit('remove', clone(item))
         this.$forceUpdate()
       }
     },
@@ -750,12 +751,7 @@ export default {
           this.item_title_edit_focus(new_item)
         }
       }
-      else if('del' === keyname ) {
-        this.remove_item(item)
-        this.$emit('remove', clone(item))
-      }
       else if('tab' === keyname ) {
-
         if(this.spec.ux.keys.tab_saves) {
           this.$emit('save', clone(item))
         }
