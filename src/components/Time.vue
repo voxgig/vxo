@@ -1,5 +1,6 @@
 <template>
 <span
+  class="vxo-time"
   :class="classes"
   :style="styling"
   >{{ start }}{{ '' != end ? '&ndash;'+end : '' }}</span>

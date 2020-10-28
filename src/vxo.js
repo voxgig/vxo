@@ -1,5 +1,7 @@
 import './vxo.scss'
 
+import Pkg from '../package.json'
+
 import VxoCanary from './components/Canary.vue'
 import VxoTaskBox from './components/TaskBox.vue'
 import VxoSlideSelect from './components/SlideSelect.vue'
@@ -23,6 +25,10 @@ Vxo.install = function (Vue, options) {
     Vue.component(name, co[name])
     Vxo.found.push(name)
   })
+
+  Vue.prototype.$vxo = {
+    version: Pkg.version
+  }
 }
 
 export default Vxo

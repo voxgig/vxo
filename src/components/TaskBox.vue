@@ -68,6 +68,7 @@
         :key="item.meta.mark"
         v-if="!item.meta.flags.remove"
         :class="list_item_classes(item)"
+        @mouseenter="set_active_item(item)"
         >
         
         <v-list-item-content
@@ -102,19 +103,13 @@
             hide-details
             v-if="item.meta.state.edit && !item.meta.state.empty"
             v-model="item.task.title"
-            @keyup.enter="item_title_key('enter',item)"
+            @keyup.enter="item_title_key('ent',item)"
             @keyup.esc="item_title_key('esc',item)"
             @keydown.tab="item_title_key('tab',item)"
             :ref="'item'+item.meta.index"
             >
           </v-text-field>
           
-<!--          
-          <v-spacer
-            v-if="has_title_editor_link(item)"
-            class="vxo-task-box-title-editor-link vxo-task-box-title-editor-link-spacer"
-            ></v-spacer>
--->
           <p
             style="align-self:right;"
             v-if="has_title_editor_link(item)"
@@ -281,13 +276,14 @@
 // NOTE:
 // item: { task, meta }
 
-//import Vue from 'vue'
 import { JoiProps, Joi, JT, JF, JB, JS, JN, JO, JA, JOu } from 'joiprops'
 
 import Common from './common'
 import TaskBoxEditor from './TaskBoxEditor.vue'
 
-const { clone, genid } = Common
+const { clone, genid, debug } = Common
+const print = debug.extend('task-box')
+
 
 const joiprops = JoiProps({
   spec: JO({
@@ -433,14 +429,26 @@ export default {
     return {
       edit: false,
       editor_item: {},
+      active_item: {},
       items: [],
-      list_visible: this.spec.ux.init_list_visible
+      list_visible: this.spec.ux.init_list_visible,
+      keys_active: false,
     }
   },
   
   created () {
-    window.vtb = this
     this.init()
+    print('init')
+  },
+  mounted () {
+    this.$el.addEventListener('mouseenter', this.activate_keys)
+    this.$el.addEventListener('mouseleave', this.deactivate_keys)
+    window.addEventListener('keyup', this.handle_key)
+  },
+  destroyed () {
+    this.$el.removeEventListener('mouseenter', this.activate_keys)
+    this.$el.rmeoveEventListener('mouseleave', this.deactivate_keys)
+    window.removeEventListener('keyup', this.handle_key)
   },
   watch: {
     'trigger.new_task' (new_task) {
@@ -482,8 +490,16 @@ export default {
       })
 
       this.update_items()
+      this.$forceUpdate()
     },
 
+    activate_keys () {
+      this.keys_active = true
+    },
+    
+    deactivate_keys () {
+      this.keys_active = false
+    },
     
     norm_items (edit_item) {
       let index = 0
@@ -516,14 +532,15 @@ export default {
       return new_item
     },
 
-    print_items (note) {
-      console.log('VOXGIG TaskBox', this.spec.id, note, '\n'+this.items.map(
+    describe (note) {
+      let s = print.enabled && (this.spec.id+' '+note+'\n'+this.items.map(
         x=>[
           x.meta.index,
           JSON.stringify(x.meta.state),
           x.task.state,
           new String(x.task.title),
         ].join('|')).join('\n'))
+      return s
     },
     
     update_items () {
@@ -552,7 +569,7 @@ export default {
         }
       }
 
-      // this.print_items('update')
+      print(this.describe('update'))
     },
     edit_slot (field) {
       return 'edit.'+field.name
@@ -618,8 +635,10 @@ export default {
       return new_item
     },
     remove_item (item) {
-      item.meta.flags.remove = true
-      this.$forceUpdate()
+      if(item) {
+        item.meta.flags.remove = true
+        this.$forceUpdate()
+      }
     },
     save_item (item) {
       item.meta.state.edit = false
@@ -657,7 +676,7 @@ export default {
 
         this.norm_items()
         
-        //if(item.meta.state.adder && item.title === this.spec.text.add_last) {
+        // TODO: this is not robust
         if(item.task.title === this.spec.text.add_last) {
           item.task.title = ''
         }
@@ -679,17 +698,35 @@ export default {
         }
       })
     },
+
+    set_active_item (item) {
+      this.active_item = item
+    },
+    
+    handle_key (keyevent) {
+      if(!this.keys_active) return;
+      
+      if('Escape' === keyevent.key ) {
+        return this.update_items()
+      }
+      else if('Delete' === keyevent.key || 'Backspace' === keyevent.key) {
+        if(this.active_item) {
+          this.remove_item(this.active_item)
+        }
+      }
+    },
     
     item_title_key (keyname, item) {
       if('esc' === keyname ) {
-        item.meta.state.edit = false
+        if(item) {
+          item.meta.state.edit = false
 
-        if(item.meta.last) {
-          item.task.title = item.meta.last.title
+          if(item.meta.last) {
+            item.task.title = item.meta.last.title
+          }
         }
 
-        this.update_items()
-        return
+        return this.update_items()
       }
       
       // Save if title non-empty
@@ -702,7 +739,7 @@ export default {
       // Ensure everything is consistent
       this.update_items()
 
-      if('enter' === keyname ) {
+      if('ent' === keyname ) {
 
         if(this.spec.ux.keys.enter_saves) {
           this.$emit('save', clone(item))
@@ -712,6 +749,10 @@ export default {
           let new_item = this.append_item(null,{state:{edit:true}},item)
           this.item_title_edit_focus(new_item)
         }
+      }
+      else if('del' === keyname ) {
+        this.remove_item(item)
+        this.$emit('remove', clone(item))
       }
       else if('tab' === keyname ) {
 

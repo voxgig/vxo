@@ -1,3 +1,5 @@
+import Debug from 'debug'
+
 export default {
   clone: (x) => JSON.parse(JSON.stringify(x)),
   genid: (p) =>
@@ -16,4 +18,5 @@ export default {
       },
     },
   },
+  debug: Debug('vxo')
 }
