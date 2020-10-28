@@ -18,5 +18,5 @@ export default {
       },
     },
   },
-  debug: Debug('vxo')
+  debug: Debug('vxo'),
 }
