@@ -87,15 +87,7 @@
             v-if="!item.meta.state.edit && !item.meta.state.empty"
             style="flex-grow: 2;"
             >
-            {{ item.task.title }}
-            
-            <!--
-                <small>
-                  adder: {{ item.meta.state.adder }}
-                  edit: {{ item.meta.state.edit }}
-                  empty: {{ item.meta.state.empty }}
-                </small>
-                -->
+            {{ item.task.title }}            
           </p>
           
           <v-text-field
@@ -141,9 +133,9 @@
           </span>
           
           <slot
+            :name="'custom.'+field.name"
             :item="item"
             :field="field"
-            :name="'custom.'+field.name"
             v-if="field.kind=='custom'"
             >
             {{ item.task[field.name] }}
@@ -203,6 +195,7 @@
     @toggle_status="editor_toggle_status"
     @update_field="editor_update_field"
     @create_item="editor_create_item"
+    @delete_item="editor_delete_item"
     >
     <template
       v-for="field in spec.fields"
@@ -341,6 +334,7 @@ const joiprops = JoiProps({
       title_editor_link: JS('Details'),
       editor: JO({
         create_task: JS('Create task...'),
+        delete_task: JS('Delete task'),
         task_state: JO({
           done: JS('Mark not done'),
           todo: JS('Mark done'),
@@ -393,7 +387,7 @@ const joiprops = JoiProps({
         active: JF,
         text: JS('Add task'),
         bind: JO()
-      })
+      }),
     }),
 
     custom: JO({
@@ -636,6 +630,7 @@ export default {
     },
     remove_item (item) {
       if(item) {
+        console.log('VTB REMOVE', item)
         item.meta.flags.remove = true
         this.$emit('remove', clone(item))
         this.$forceUpdate()
@@ -796,6 +791,11 @@ export default {
     editor_update_field ({field,item}) {
       if(this.editor_item) {
         this.$set(this.editor_item.task, field.name, item.task[field.name])
+      }
+    },
+    editor_delete_item () {
+      if(this.editor_item) {
+        this.remove_item(this.editor_item)
       }
     },
     editor_create_item (item) {

@@ -22,6 +22,8 @@
         @click="toggle_status"
         > {{ spec.text.editor.task_state[item.task.state] }} </v-btn>
 
+
+      
       <v-btn
         v-if="item.meta.new"
         outlined
@@ -29,6 +31,14 @@
         @click="create_item(item)"
         > {{ spec.text.editor.create_task }} </v-btn>
       <v-spacer />
+
+      <v-btn
+        outlined
+        class="vxo-task-box-editor-toolbar-btn"
+        style="margin-right: 32px;"
+        @click="delete_item(item)"
+        > {{ spec.text.editor.delete_task }} </v-btn>
+
       <v-icon @click="open=false">mdi-close</v-icon>
     </v-toolbar>
 
@@ -205,6 +215,11 @@ export default {
     },
     update_field: function(field,item) {
       this.$emit('update_field', {field,item})
+    },
+    delete_item: function(item) {
+      console.log('VTBE delete_item', item)
+      this.$emit('delete_item', {item})
+      this.open = false
     },
     create_item: function(item) {
       this.$emit('create_item', item)
