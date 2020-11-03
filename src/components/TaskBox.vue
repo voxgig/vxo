@@ -26,7 +26,9 @@
     <v-btn
       v-if="spec.tool.add.active"
       v-bind="spec.tool.add.bind"
+      :class="spec.tool.add.class"
       @click.stop.prevent="add_item"
+      outlined
       >
       {{ spec.tool.add.text }}
     </v-btn>
@@ -70,7 +72,7 @@
         :class="list_item_classes(item)"
         @mouseenter="set_active_item(item)"
         >
-        
+
         <v-list-item-content
           v-if="!has_custom_title"
           class="vxo-task-box-item-title vxo-task-box-item-field"
@@ -382,8 +384,8 @@ const joiprops = JoiProps({
       'vxo-task-box': JT,
     }),
 
-    tool: JO({
-      add: JO({
+    tool: JOu({
+      add: JOu({
         active: JF,
         text: JS('Add task'),
         bind: JO()
@@ -391,7 +393,7 @@ const joiprops = JoiProps({
     }),
 
     custom: JO({
-      title: JS()
+      title: JF
     })
 
   }).unknown().required()
@@ -441,7 +443,7 @@ export default {
   },
   destroyed () {
     this.$el.removeEventListener('mouseenter', this.activate_keys)
-    this.$el.rmeoveEventListener('mouseleave', this.deactivate_keys)
+    this.$el.removeEventListener('mouseleave', this.deactivate_keys)
     window.removeEventListener('keyup', this.handle_key)
   },
   watch: {
@@ -465,7 +467,7 @@ export default {
       return fields
     },
     has_custom_title () {
-      return this.spec.custom.title ||
+      return true === this.spec.custom.title ||
         this.spec.fields.filter(f=>f.name==='title' && f.custom).length>0
     },
     headers () {
