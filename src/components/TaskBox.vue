@@ -392,7 +392,7 @@ const joiprops = JoiProps({
       }),
     }),
 
-    custom: JO({
+    custom: JOu({
       title: JF
     })
 

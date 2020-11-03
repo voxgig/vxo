@@ -95,6 +95,13 @@ export default {
       return out
     }
   },
+  watch: {
+    value (index) {
+      if(this.selected != index) {
+        this.selected = index
+      }
+    }
+  },
   methods: {
     action_item: function(item, index) {
       this.selected = index
