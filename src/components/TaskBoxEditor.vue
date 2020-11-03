@@ -193,16 +193,18 @@ export default {
       var fields = this.fields = []
 
       for(var i = 0; i < spec.fields.length; i++) {
-        var field = clone(spec.fields[i])
+        if(spec.fields[i].show_edit) {
+          var field = clone(spec.fields[i])
 
-        if(null == field.name) {
-          throw new Error(`Missing field.name on field ${i}: ${field}`)
+          if(null == field.name) {
+            throw new Error(`Missing field.name on field ${i}: ${field}`)
+          }
+
+          field.index = i
+          field.kind = taskbox.field.kinds[field.kind] ? field.kind : 'string'
+          
+          fields.push(field)
         }
-
-        field.index = i
-        field.kind = taskbox.field.kinds[field.kind] ? field.kind : 'string'
-
-        fields.push(field)
       }
     },
     init_edit: function() {

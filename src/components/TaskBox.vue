@@ -359,6 +359,8 @@ const joiprops = JoiProps({
       kind: JS(),
       label: JS().allow(null),
       show_label: JT,
+      show_list: JT,
+      show_edit: JT,
     })).default([{name:'title',label:'Task'}]),
 
 
@@ -463,7 +465,7 @@ export default {
   },
   computed: {
     field_list () {
-      var fields = this.spec.fields.filter(f=>f.name!=='title') 
+      var fields = this.spec.fields.filter(f=>f.name!=='title' && f.show_list) 
       return fields
     },
     has_custom_title () {
@@ -471,7 +473,10 @@ export default {
         this.spec.fields.filter(f=>f.name==='title' && f.custom).length>0
     },
     headers () {
-      return this.spec.ux.headers
+      return this.spec.ux.headers.filter(h=>{
+        var field = this.spec.fields.find(f=>f.name===h.name)
+        return null == field ? true : field.show_list
+      })
     },
     has_ux_actions () {
       let actions = this.spec.ux.actions

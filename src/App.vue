@@ -163,6 +163,17 @@ export default {
             text: {
               add_item: 'Add Foo'
             },
+            ux: {
+              headers: [
+                { title: 'CONTROLS' },
+                { title: 'COMPLETE', name: 'complete' },
+                { title: 'TITLE', name: 'title' },
+                { title: 'BAR', name: 'bar' },
+                { title: 'ZED', name: 'zed' },
+                { title: 'BAZ', name: 'baz' },
+                { title: 'FOO', name: 'foo' },
+              ],
+            },
             fields: [
               {
                 name:'complete',
@@ -183,6 +194,9 @@ export default {
               },
               {
                 name:'foo',
+                kind:'text',
+                show_list: false,
+                show_edit: false,
                 //kind:'component',
                 //component: 'foo-bar'
               },
@@ -200,7 +214,8 @@ export default {
               foo:'F0',
             },
             {
-              id:'02', title:'t02', complete:false, state:'todo', bar:'B1', zed:'Z1'
+              id:'02', title:'t02', complete:false, state:'todo', bar:'B1', zed:'Z1',
+              foo:'F1'
             },
             {
               id:'03', title:'t03', complete:false, state:'todo', bar:'B2', zed:'Z2'
