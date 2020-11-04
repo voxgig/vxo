@@ -2,7 +2,14 @@
 <v-app>
   <h1>TESTBED</h1>
 
-    <!--
+      <!--
+  <vxo-deep
+    :items="deep.items"
+    >
+  </vxo-deep>
+
+  
+
   <vxo-canary
     :a="a"
     :b="b"
@@ -24,7 +31,7 @@
   9:30&ndash;15:15: <vxo-time :time="{start:930, end:1515}" /> <br>
   9:30a&ndash;3:15p: <vxo-time :time="{start:930, end:1515}" clock="m"/> <br>
   </p>
-  -->
+
 
 
   <vxo-task-box
@@ -38,61 +45,55 @@
     :spec="test.taskbox0.spec"
     v-model="test.taskbox0.items"
     >
-    <!--
-    <template v-slot:custom.zed="{ item }">
-      ZED {{ item.zed }}
-    </template>
-    -->
     
     <template v-slot:edit.zed="{item, field, name}">
       APP ZED {{ item }} {{ field }} {{ name }}
     </template>
-
-    <!--
-    <template v-slot:edit.baz="{task, field}">
-      APP BAZ {{ task }} {{ field }}
-    </template>
-    -->
   </vxo-task-box>
 
   
   <hr>
   <br>
 
+-->
 
-<!--
+
   <vxo-slide-select
     :items="test.slideselect0.items"
-    :size="3"
+    :spec="test.slideselect0.spec"
     v-model="test.slideselect0.index"
     >
   </vxo-slide-select>
 
-  <p>INDEX: {{ test.slideselect0.index }}</p>
+  <p>INDEX: <input v-model="test.slideselect0.indexstr" /> {{ test.slideselect0.index }} </p>
   
   <br>
   <hr>
-  
 
+
+  
   <br>
   <vxo-slide-select
-    :range="test.slideselect1.range"
+    :spec="test.slideselect1.spec"
     :size="7"
+    :styling="test.slideselect1.styling"
     v-model="test.slideselect1.index"
+    @slide="slide1"
     >
     <template v-slot:item={item}>
       <div style="display:flex; flex-flow: column nowrap; justify-content: center;">
-        <p>{{ resolve_dow(item) }} </p>
-        <p>{{ resolve_day(item) }}</p>
+        {{ item.index }} # {{ item.offset }} # {{ item.day }}
+        <br />
+        {{ item.date }}
       </div>
     </template>
   </vxo-slide-select>
-  INDEX: {{ test.slideselect1.index }} 
-  DAY: {{ day_selected(test.slideselect1.index) }}
+  INDEX: <input v-model="test.slideselect1.index" > 
+  DATE: <input v-model="test.slideselect1.date" >
   <br>
 
   <hr>
-  -->
+
   
 </v-app>
 </template>
@@ -103,6 +104,13 @@ export default {
   name: "app",
   data: function() {
     return {
+      deep: {
+        items: [
+          { a: 1, b: 'B1' },
+          { a: 2, b: 'B2' },
+          { a: 3, b: 'B3' },
+        ]
+      },
       a: 'A',
       b: { e: 'E' },
       test: {
@@ -223,7 +231,11 @@ export default {
           ]
         },
         slideselect0: {
+          spec: {
+            size: 3,
+          },
           index: 0,
+          indexstr: '0',
           items: [
             {text:'AAA'},
             {text:'BBB'},
@@ -237,32 +249,101 @@ export default {
           ]
         },
         slideselect1: {
-          index: 109,
-          range:this.weeks(15),
+          spec: {
+            modify: (slides, initial) => {
+              slides = slides.map(slide=>{
+                var today = this.$Moment()
+                var day = today.add(slide.offset,'days')
+                slide.date = day.format('YYYY-MM-DD')
+                slide.day = day.format('MMM Do')
+                return slide
+              })
+              return [slides, initial]
+            },
+            initial: 108,
+            range: this.weeks(15),
+          },
+
+          index: null,
+          date: '',
+          
+          input: '',
+
+          styling: {
+            height: '100px'
+          },
+
         }
+      }
+    }
+  },
+  created () {
+    window.deep = this.deep
+  },
+  watch: {
+    'test.slideselect0.index': function(val) {
+      var valstr = ''+val
+      if(valstr !== this.test.slideselect0.indexstr) {
+        this.test.slideselect0.indexstr = valstr
+      }
+    },
+    'test.slideselect0.indexstr': function(valstr) {
+      if(''===valstr) return;
+      
+      var val = parseInt(valstr)
+      if(val !== this.test.slideselect0.index) {
+        this.test.slideselect0.index = val
+      }
+    },
+
+    'test.slideselect1.index': function(valstr) {
+      this.test.slideselect1.index = parseInt(valstr)
+    },
+    'test.slideselect1.date': function(datestr) {
+      let today = this.$Moment().startOf('day')
+      let date = this.$Moment(datestr,'YYYY-MM-DD')
+      let dd = date.diff(today,'days')
+
+      if(!isNaN(dd)){
+        let index = this.test.slideselect1.spec.initial + dd
+        //console.log('date index', index)
+        this.test.slideselect1.index = index
       }
     }
   },
   methods: {
     day_selected: function(index) {
       let r = this.test.slideselect1.range
-      return this.$Moment().add(index-(Math.floor((1+r.end-r.start)/2)),'days')
+      return this.$Moment()
+        .add(index-(Math.floor((1+r.end-r.start)/2)),'days')
+        .format('MMM-DD')
     },
     weeks: function(n) {
       var wd = this.$Moment().day()
       return {start:(-7*n)-wd,end:(7*(n+1))-wd}
     },
+    /*
     resolve_dow: function(item) {
       return this.$Moment().add(item.offset,'days').format('ddd')
     },
     resolve_day: function(item) {
       return this.$Moment().add(item.offset,'days').format('MMM Do')
+    },
+*/
+
+    slide1: function(slide) {
+      console.log('slide1', slide.date)
+      this.test.slideselect1.date = slide.date
     }
   }
 }
 </script>
 
 <style lang="scss">
+.vxo-slide-select {
+    width: 70vw;
+}
+
 .vxo-slide-select-main {
     border:1px solid #333;
 }

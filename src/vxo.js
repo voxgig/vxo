@@ -8,7 +8,6 @@ import VxoSlideSelect from './components/SlideSelect.vue'
 import VxoTime from './components/Time.vue'
 
 
-
 const Vxo = {
   found: [],
 }
