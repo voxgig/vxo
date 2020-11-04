@@ -278,7 +278,7 @@ export default {
     }
   },
   created () {
-    window.deep = this.deep
+
   },
   watch: {
     'test.slideselect0.index': function(val) {
@@ -322,14 +322,6 @@ export default {
       var wd = this.$Moment().day()
       return {start:(-7*n)-wd,end:(7*(n+1))-wd}
     },
-    /*
-    resolve_dow: function(item) {
-      return this.$Moment().add(item.offset,'days').format('ddd')
-    },
-    resolve_day: function(item) {
-      return this.$Moment().add(item.offset,'days').format('MMM Do')
-    },
-*/
 
     slide1: function(slide) {
       console.log('slide1', slide.date)
