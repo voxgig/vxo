@@ -42,7 +42,7 @@
     
     <slot
       name="header"
-      v-if="spec.ux.headers"
+      v-if="spec.ux.show_headers"
       >
       <v-list-item
         class="vxo-task-box-item-headers"
@@ -311,6 +311,7 @@ const joiprops = JoiProps({
       toolbar: JT,
       add_last: JF,          
       open_rows: JN(0).min(0),
+      show_headers: JT,
       
       actions: JO({
         remove: JT,
@@ -562,7 +563,7 @@ export default {
 
       if( this.spec.ux.add_last ) {
         var adder = this.items.find(x=>x.meta.state.adder)
-        if(null == adder) {
+        if(null == adder && this.spec.ux.open_rows) {
           adder = this.items.find(x=>x.meta.state.empty)
           adder.meta.state.adder = true
           adder.meta.state.empty = false
@@ -637,7 +638,6 @@ export default {
     },
     remove_item (item) {
       if(item) {
-        console.log('VTB REMOVE', item)
         item.meta.flags.remove = true
         this.$emit('remove', clone(item))
         this.$forceUpdate()

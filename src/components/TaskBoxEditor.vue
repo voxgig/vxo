@@ -219,7 +219,6 @@ export default {
       this.$emit('update_field', {field,item})
     },
     delete_item: function(item) {
-      console.log('VTBE delete_item', item)
       this.$emit('delete_item', {item})
       this.open = false
     },
