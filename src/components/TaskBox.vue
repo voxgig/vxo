@@ -11,7 +11,7 @@
     >
     <h3
       v-if="null!=spec.title"
-      @click="title_toggle"
+      @click="click_title_toggle"
       >
       {{ spec.title }}
       <span
@@ -27,7 +27,7 @@
       v-if="spec.tool.add.active"
       v-bind="spec.tool.add.bind"
       :class="spec.tool.add.class"
-      @click.stop.prevent="add_item"
+      @click.stop.prevent="click_add_item"
       outlined
       >
       {{ spec.tool.add.text }}
@@ -68,38 +68,46 @@
       <v-list-item
         v-for="item in items"
         :key="item.meta.mark"
-        v-if="!item.meta.flags.remove"
         :class="list_item_classes(item)"
-        @mouseenter="set_active_item(item)"
+        @mouseenter="mouse_set_active_item(item)"
         >
 
         <v-list-item-content
           v-if="!has_custom_title"
           class="vxo-task-box-item-title vxo-task-box-item-field"
-          @click.stop.prevent="item_title_action($event,item)"
+          @click.stop.prevent="click_item_title($event,item)"
           >
           <v-icon
             left
             :class="'vxo-task-box-state-icon-'+item.task.state"
             v-if="spec.ux.state && !item.meta.state.empty"
-            @click.stop.prevent="change_item_state(item)"
+            @click.stop.prevent="click_change_item_state(item)"
             >{{ item_state_icon(item) }}</v-icon>
           
           <p
-            v-if="!item.meta.state.edit && !item.meta.state.empty"
+            v-if="!item.meta.state.edit"
             style="flex-grow: 2;"
             >
-            {{ item.task.title }}            
+            {{ format_task_title(item) }}            
           </p>
-          
+
+<!--
+          <small>
+            {{ item.meta.index }}
+            {{ item.meta.flags }}
+            {{ item.meta.state }}
+          </small>
+-->
+
           <v-text-field
             outlined
             hide-details
-            v-if="item.meta.state.edit && !item.meta.state.empty"
+            v-if="item.meta.state.edit"
             v-model="item.task.title"
-            @keyup.enter="item_title_key('ent',item)"
-            @keyup.esc="item_title_key('esc',item)"
-            @keydown.tab="item_title_key('tab',item)"
+            @keyup.enter="key_item_title_ent(item)"
+            @keyup.esc="key_item_title_esc(item)"
+            @keyup.delete="key_item_title_delete(item)"
+            @keydown.tab.stop.prevent="key_item_title_tab(item)"
             :ref="'item'+item.meta.index"
             >
           </v-text-field>
@@ -108,7 +116,7 @@
             style="align-self:right;"
             v-if="has_title_editor_link(item)"
             class="vxo-task-box-title-editor-link vxo-task-box-title-editor-link-text"
-            @click.stop.prevent="edit_item(item)"
+            @click.stop.prevent="click_edit_item(item)"
             >
             <span>{{ spec.text.title_editor_link }}</span>
             <v-icon
@@ -124,7 +132,7 @@
           class="vxo-task-box-item-field"
           :style="field.styling"
           :data-field-name="field.name"
-          @click="act_item(item)"
+          @click="click_act_item(item)"
           >
           
           <span
@@ -156,19 +164,19 @@
           class="vxo-task-box-actions"
           >
           <v-icon
-            v-if="spec.ux.actions.remove && !item.meta.state.edit"
-            @click="remove_item(item)"
+            v-if="spec.ux.actions.remove"
+            @click="click_remove_item(item)"
             >{{ spec.icon.remove }}</v-icon>
           <v-icon
-            v-if="spec.ux.actions.edit && !item.meta.state.edit"
-            @click="edit_item(item)"
+            v-if="spec.ux.actions.edit"
+            @click="click_edit_item(item)"
             >{{ spec.icon.edit }}</v-icon>
           <v-icon
-            v-if="spec.ux.actions.save && item.meta.state.edit"
-            @click="save_item(item)"
+            v-if="spec.ux.actions.save"
+            @click="click_save_item(item)"
             >{{ spec.icon.save }}</v-icon>
           <v-icon
-            v-if="spec.ux.actions.drag && !item.meta.state.edit"
+            v-if="spec.ux.actions.drag"
             class="vxo-task-box-handle"
             >{{ spec.icon.drag }}</v-icon>
         </v-list-item-icon>
@@ -328,12 +336,15 @@ const joiprops = JoiProps({
         enter_saves: JT,
         enter_inserts: JF,
         tab_saves: JT,
+        esc_cancels: JT,
+        del_removes: JT,
       }),
     }),
     
     text: JO({
       add_item: JS('Add task...'),
       add_last: JS('Add task...'),
+      empty_title: JS('--'),
       title_editor_link: JS('Details'),
       editor: JO({
         create_task: JS('Create task...'),
@@ -437,29 +448,22 @@ export default {
   
   created () {
     this.init()
-    print('init')
   },
   mounted () {
-    this.$el.addEventListener('mouseenter', this.activate_keys)
-    this.$el.addEventListener('mouseleave', this.deactivate_keys)
-    window.addEventListener('keyup', this.handle_key)
+    if(this.$el) {
+      this.$el.addEventListener('mouseenter', this.activate_keys)
+      this.$el.addEventListener('mouseleave', this.deactivate_keys)
+      window.addEventListener('keyup', this.key_handler_general)
+    }
   },
   destroyed () {
-    this.$el.removeEventListener('mouseenter', this.activate_keys)
-    this.$el.removeEventListener('mouseleave', this.deactivate_keys)
-    window.removeEventListener('keyup', this.handle_key)
+    if(this.$el) {
+      this.$el.removeEventListener('mouseenter', this.activate_keys)
+      this.$el.removeEventListener('mouseleave', this.deactivate_keys)
+      window.removeEventListener('keyup', this.key_handler_general)
+    }
   },
   watch: {
-    'trigger.new_task' (new_task) {
-      // TODO
-      /*
-      var new_item = clone(new_task)
-      new_item.$mark = Math.random()
-      new_item.meta.state.edit = false
-      new_item.$new = true
-      this.edit_item(new_item)
-      */
-    },
     value () {
       this.init()
     }
@@ -485,111 +489,248 @@ export default {
     }
   },
   methods: {
+    
     init () {
-      let index = 0
       this.items = [...this.value||[]].map(task=>{
-        return this.new_item(task,{index: index++})
+        return this.make_new_item(task)
       })
 
-      this.update_items()
-      this.$forceUpdate()
+      this.norm_items('init')
     },
 
-    activate_keys () {
-      this.keys_active = true
-    },
     
-    deactivate_keys () {
-      this.keys_active = false
+    click_title_toggle () {
+      this.list_visible = !this.list_visible
     },
-    
-    norm_items (edit_item) {
-      let index = 0
-      this.items.forEach(item => {
-        if(null == item.task) return;
 
-        let is_edit_item = edit_item ? item.meta.mark === edit_item.meta.mark : false
-        item.meta.index = index++
-        item.meta.state.edit = is_edit_item ? edit_item.meta.mark : false
+    click_add_item () {
+      this.norm_items('click_add_item')
+      this.items.push(this.make_new_item())
+    },
 
-        if(!is_edit_item ) { 
-          // Disallow empty titles on existing items
-          if(''===item.task.title || null == item.task.title) {
-            item.task.title =
-              item.meta.last ? item.meta.last.title : this.spec.text.add_last
+    click_item_title (event, item) {
+      if(!this.spec.ux.title.edit) {
+        this.edit_item(item)
+      }
+
+      event.stopPropagation()
+      event.preventDefault()
+
+      this.norm_items('click_item_title')
+
+      if(!item.meta.state.empty) {
+        this.edit_item_title(item)
+      }
+    },
+
+    click_act_item (item) {
+      this.norm_items('click_act_item')
+      this.edit_item(item)
+    },
+
+    click_edit_item (item) {
+      this.norm_items('click_edit_item')
+      if(!item.meta.state.empty) {
+        this.edit_item(item)
+      }
+    },
+
+    click_save_item (item) {
+      this.norm_items('click_save_item')
+      this.save_item(item)
+    },
+
+    click_remove_item (item) {
+      this.norm_items('click_remove_item')
+      this.remove_item(item)
+    },
+
+    click_change_item_state (item) {
+      this.norm_items('click_change_item_state')
+      this.change_item_state (item)
+    },
+
+    mouse_set_active_item (item) {
+      this.active_item = item
+    },
+
+    key_item_title_delete (item) {
+      if( this.spec.ux.keys.del_removes ) {
+        if( item.meta.flags.new ) {
+          if( null == item.task.title || '' == item.task.title) {
+            this.remove_item(item)
           }
         }
+      }
+    },
+
+    key_item_title_esc (item) {
+      if(this.spec.ux.keys.esc_cancels) {
+        this.norm_items('key_item_title_esc')
+        this.cancel_edit_item_title(item)
+      }
+    },
+
+    key_item_title_tab (item) {
+      if(this.spec.ux.keys.tab_saves) {
+        this.norm_items('key_item_title_tab')
+        this.save_item(item)
+      }
+    },
+
+    key_item_title_ent (item) {
+      if(this.spec.ux.keys.enter_saves || this.spec.ux.keys.enter_inserts) {
+        this.norm_items('key_item_title_ent')
+      }
+
+      if( null == item.task.title || '' == item.task.title) {
+        item.meta.state.edit = true
+      }
+      else {
+        if(this.spec.ux.keys.enter_saves) {
+          this.save_item(item)
+        }
+        
+        if(this.spec.ux.keys.enter_inserts) {
+          let new_item = this.insert_item(item)
+          this.edit_item_title(new_item)
+        }
+      }
+    },
+    
+    key_handler_general (keyevent) {
+      if(!this.keys_active) return;
+    },
+
+
+    
+    norm_items (whence) {
+      let index = 0
+
+      if( this.spec.ux.open_rows ) {
+        if(this.items.length < this.spec.ux.open_rows) {
+          while(this.items.length < this.spec.ux.open_rows) {
+            this.append_item(null,{state:{empty:true}})
+          }
+        }
+        else if(this.items.length < this.spec.ux.open_rows) {
+          let firstempty = this.items.length-1
+          while( this.items[firstempty].meta.state.empty &&
+                 this.spec.ux.open_rows <= firstempty) {
+            firstempty--
+          }
+          if(firstempty < this.items.length-1) {
+            this.items.splice(firstempty,this.items.length-firstempty)
+          }
+        }
+      }
+  
+      if( this.spec.ux.add_last ) {
+        let item = null
+
+        let lastindex = this.items.length
+        while( this.items[lastindex-1] &&
+               (this.items[lastindex-1].meta.state.empty ||
+                this.items[lastindex-1].meta.state.adder) )
+        {
+          item = this.items[--lastindex]
+        }
+        
+        if(null == item) {
+          this.append_item(null,{state:{adder:true,empty:false}})
+        }
+        else {
+          item.meta.state.adder = true
+          item.meta.state.empty = false
+        }
+      }
+
+      this.items.forEach(item => {
+        item.meta.index = index++
+        item.meta.state.edit = false
       })
 
-      // this.print_items('norm')
+      print(this.describe('norm-'+whence))
     },
 
     append_item(task,meta,after_item) {
-      let new_item = this.new_item(task, meta)
+      let new_item = this.make_new_item(task, meta)
 
       this.items.splice(
         null == after_item ? this.items.length : after_item.meta.index+1,0,new_item)
-      this.norm_items(new_item.meta.state.edit ? new_item : null)
+
+      let index = 0
+      this.items.forEach(item=>{
+        item.meta.index = index++
+      })
+      
+      return new_item
+    },
+
+    edit_item (item) {
+      this.editor_item = item
+      this.edit = true
+    },
+
+    
+    edit_item_title (item) {
+      item.meta.last = clone(item.task)
+      item.meta.state.edit = true
+
+      this.focus_item_title_edit(item)
+    },
+    
+    cancel_edit_item_title (item) {
+      item.meta.state.edit = false
+
+      if(item.meta.flags.new && '' === item.task.title) {
+        this.remove_item(item)
+      }
+          
+      else if(item.meta.last) {
+        item.task.title = item.meta.last.title
+      }
+    },
+
+    
+    change_item_state (item) {
+      item.task.state = this.spec.statemap[item.task.state] || 'todo'
+      this.$emit('state', clone(item))
+    },
+
+    save_item (item) {
+      item.meta.state.edit = false
+      item.meta.state.adder = false
+      item.meta.state.empty = false
+      item.meta.flags.new = false
+      this.$emit('save', clone(item))
+    },
+
+    remove_item (item) {
+      this.items.splice(item.meta.index,1)
+      this.norm_items('remove_item')
+      
+      if(!item.meta.state.new) {
+        this.$emit('remove', clone(item))
+      }
+    },
+
+
+    insert_item (item) {
+      // use empties if immediately following
+      let following = null == item ? null : this.items[item.meta.index+1]
+          
+      let new_item = this.is_empty(following) ? following : 
+          this.append_item(null,null,item)            
+
+      new_item.meta.state.empty = false
+      new_item.meta.flags.new = true
 
       return new_item
     },
 
-    describe (note) {
-      let s = print.enabled && (this.spec.id+' '+note+'\n'+this.items.map(
-        x=>[
-          x.meta.index,
-          JSON.stringify(x.meta.state),
-          x.task.state,
-          new String(x.task.title),
-        ].join('|')).join('\n'))
-      return s
-    },
     
-    update_items () {
-      this.norm_items()
-
-      if( this.spec.ux.open_rows ) {
-        var empty = this.items.find(x=>x.meta.state.empty)
-        var adder = this.items.find(x=>x.meta.state.adder)
-        var len = Math.max(
-          this.spec.ux.open_rows,
-          this.items.length+
-            (null==empty&&null==adder?1:0))
-
-        while(this.items.length < len) {
-          this.append_item(null,{state:{empty:true}})
-        }
-      }
-
-      if( this.spec.ux.add_last ) {
-        var adder = this.items.find(x=>x.meta.state.adder)
-        if(null == adder && this.spec.ux.open_rows) {
-          adder = this.items.find(x=>x.meta.state.empty)
-          adder.meta.state.adder = true
-          adder.meta.state.empty = false
-          adder.task.title = this.spec.text.add_last
-        }
-      }
-
-      print(this.describe('update'))
-    },
-    edit_slot (field) {
-      return 'edit.'+field.name
-    },
-    add_item () {
-      this.items.push(this.new_item())
-    },
-    new_task (task) {
-      let new_task = null != task ? clone(task) : {
-        title: '',
-        state: 'todo'
-      }
-
-      new_task.state = new_task.state || 'todo'
-
-      return new_task
-    },
-    new_item (
+    make_new_item (
       task, // optional initial task data
       meta   // optional initial meta data
     ) {
@@ -619,7 +760,7 @@ export default {
             empty: (meta && meta.state && meta.state.empty || false),
             
             // First empty row where new tasks can be added
-            adder: false
+            adder: (meta && meta.state && meta.state.adder || false),
           },
           
           // Flags
@@ -636,140 +777,42 @@ export default {
       
       return new_item
     },
-    remove_item (item) {
-      if(item) {
-        item.meta.flags.remove = true
-        this.$emit('remove', clone(item))
-        this.$forceUpdate()
+
+    new_task (task) {
+      let new_task = null != task ? clone(task) : {
+        title: '',
+        state: 'todo'
       }
+
+      new_task.state = new_task.state || 'todo'
+
+      return new_task
     },
-    save_item (item) {
-      item.meta.state.edit = false
-    },
-    edit_item (item) {
-      this.edit = true
-      this.editor_item = item
-    },
-    act_item (item) {
-      this.edit_item(item)
-    },
-    make_id () {
-      return (Math.random()+'').substring(2)
-    },
-    item_state_icon (item) {
-      if(item && item.task && this.spec.icon ) {
-        item.task.state = item.task.state || 'todo'
-        let icon = this.spec.icon[item.task.state] || 'mdi-circle-outline'
-        return icon
-      }
-    },
-    change_item_state (item) {
-      this.$set(item.task, 'state', this.spec.statemap[item.task.state] || 'todo')
-      this.$set(item.meta, 'change',
-                null == item.meta.change ? 0 : item.meta.change++)
-      this.$emit('state', clone(item))
+    
+    format_task_title (item) {
+      let title = (item.meta.state.empty ? '' :
+                   item.meta.state.adder ? this.spec.text.add_last :
+                   item.task.title)
+      return null == title ? '' : title
     },
 
-    item_title_action (event, item) {
-      if(this.spec.ux.title.edit) {
-        event.stopPropagation()
-        event.preventDefault()
-
-        item.meta.last=clone(item.task)
-
-        this.norm_items()
-        
-        // TODO: this is not robust
-        if(item.task.title === this.spec.text.add_last) {
-          item.task.title = ''
-        }
-
-        item.meta.state.edit = true
-
-        this.item_title_edit_focus(item)
-      }
-      else {
-        this.act_item(item)
-      }
-    },
-
-    item_title_edit_focus (item) {
-     this.$nextTick(() => {
+    focus_item_title_edit (item) {
+      this.$nextTick(() => {
         var input_el = this.$refs['item'+item.meta.index]
-        if(input_el[0]) {
+        if(input_el && input_el[0]) {
           input_el[0].$el.querySelector('input').focus()
         }
       })
     },
 
-    set_active_item (item) {
-      this.active_item = item
-    },
-    
-    handle_key (keyevent) {
-      if(!this.keys_active) return;
-      
-      if('Escape' === keyevent.key ) {
-        return this.update_items()
-      }
-      else if('Delete' === keyevent.key || 'Backspace' === keyevent.key) {
-        if(this.active_item) {
-          this.remove_item(this.active_item)
-        }
-      }
-    },
-    
-    item_title_key (keyname, item) {
-      if('esc' === keyname ) {
-        if(item) {
-          item.meta.state.edit = false
-
-          if(item.meta.last) {
-            item.task.title = item.meta.last.title
-          }
-        }
-
-        return this.update_items()
-      }
-      
-      // Save if title non-empty
-      if('' !== item.title) {
-        item.meta.state.edit = false
-        item.meta.state.adder = false
-        item.meta.state.empty = false
-      }
-
-      // Ensure everything is consistent
-      this.update_items()
-
-      if('ent' === keyname ) {
-
-        if(this.spec.ux.keys.enter_saves) {
-          this.$emit('save', clone(item))
-        }
-
-        if(this.spec.ux.keys.enter_inserts) {
-          let new_item = this.append_item(null,{state:{edit:true}},item)
-          this.item_title_edit_focus(new_item)
-        }
-      }
-      else if('tab' === keyname ) {
-        if(this.spec.ux.keys.tab_saves) {
-          this.$emit('save', clone(item))
-        }
-      }
-    },
-    
-    make_text_style (field) {
+        make_text_style (field) {
       let style = {}
       if(field.color) {
         style.color = field.color
       }
       return style
     },
-    title_toggle () {
-      this.list_visible = !this.list_visible
-    },
+
     list_item_classes (item) {
       return [
         'vxo-task-box-item',
@@ -806,8 +849,47 @@ export default {
       }
     },
     editor_create_item (item) {
-      this.new_item(item)
-    }
+      this.make_new_item(item)
+    },
+
+    is_empty (item) {
+      return null == item ? false : (item.meta.state.empty || item.meta.state.adder) 
+    },
+
+    edit_slot (field) {
+      return 'edit.'+field.name
+    },
+
+    make_id () {
+      return (Math.random()+'').substring(2)
+    },
+
+    item_state_icon (item) {
+      if(item && item.task && this.spec.icon ) {
+        item.task.state = item.task.state || 'todo'
+        let icon = this.spec.icon[item.task.state] || 'mdi-circle-outline'
+        return icon
+      }
+    },
+
+    activate_keys () {
+      this.keys_active = true
+    },
+    
+    deactivate_keys () {
+      this.keys_active = false
+    },
+    
+    describe (note) {
+      let s = print.enabled && (this.spec.id+' '+note+'\n'+this.items.map(
+        x=>[
+          x.meta.index,
+          JSON.stringify(x.meta.state),
+          x.task.state,
+          new String(x.task.title),
+        ].join('|')).join('\n'))
+      return s
+    },    
   }
 }
 </script>

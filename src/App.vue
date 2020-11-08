@@ -33,13 +33,13 @@
   </p>
 
 
-
+-->
   <vxo-task-box
     :spec="test.taskbox1.spec"
     v-model="test.taskbox1.items"
     >
   </vxo-task-box>
-
+<!--
 
   <vxo-task-box
     :spec="test.taskbox0.spec"
@@ -55,7 +55,7 @@
   <hr>
   <br>
 
--->
+
 
 
   <vxo-slide-select
@@ -94,7 +94,8 @@
 
   <hr>
 
-  
+  -->
+      
 </v-app>
 </template>
 
@@ -126,7 +127,7 @@ export default {
             ux: {
               add_item: false,
               add_last: true,
-              open_rows: 3,
+              open_rows: 6,
 
               item: {
                 title_editor_link: true,
