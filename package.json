@@ -1,6 +1,6 @@
 {
   "name": "@voxgig/vxo",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "main": "./dist/Vxo.common.js",
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -37,10 +37,10 @@
     "@vue/eslint-config-prettier": "6.0.0",
     "@vue/test-utils": "1.1.1",
     "babel-eslint": "10.1.0",
-    "core-js": "3.6.5",
+    "core-js": "3.7.0",
     "debug": "^4.2.0",
     "deepmerge": "4.2.2",
-    "eslint": "7.12.1",
+    "eslint": "7.13.0",
     "eslint-plugin-prettier": "3.1.4",
     "eslint-plugin-vue": "7.1.0",
     "expect": "26.6.2",
