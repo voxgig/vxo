@@ -789,10 +789,10 @@ export default {
       let new_task = null != task ? clone(task) : {
         title: '',
         state: 'todo',
-        mark: genid('T'),
       }
 
       new_task.state = new_task.state || 'todo'
+      new_task.mark = new_task.mark || genid('T')
 
       return new_task
     },
