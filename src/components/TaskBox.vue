@@ -75,7 +75,7 @@
         <v-list-item-content
           v-if="!has_custom_title"
           class="vxo-task-box-item-title vxo-task-box-item-field"
-          @click.stop.prevent="click_item_title($event,item)"
+          @click="click_item_title($event,item)"
           >
           <v-icon
             left
@@ -132,7 +132,7 @@
           class="vxo-task-box-item-field"
           :style="field.styling"
           :data-field-name="field.name"
-          @click="click_act_item(item)"
+          click="click_act_item(item)"
           >
           
           <span
@@ -340,6 +340,21 @@ const joiprops = JoiProps({
         del_removes: JT,
       }),
     }),
+
+
+    click: JO({
+      item_title: JO({
+        stop: JT,
+        prevent: JT,
+        ignore: JF,
+      }),
+      act_item: JO({
+        stop: JT,
+        prevent: JT,
+        ignore: JF,
+      }),
+    }),
+
     
     text: JO({
       add_item: JS('Add task...'),
@@ -509,6 +524,8 @@ export default {
     },
 
     click_item_title (event, item) {
+      if(this.handle_click(event, this.spec.click.item_title)) return;
+      
       if(!this.spec.ux.title.edit) {
         this.edit_item(item)
       }
@@ -524,6 +541,8 @@ export default {
     },
 
     click_act_item (item) {
+      if(this.handle_click(event, this.spec.click.act_item)) return;
+      
       this.norm_items('click_act_item')
       this.edit_item(item)
     },
@@ -602,6 +621,17 @@ export default {
       if(!this.keys_active) return;
     },
 
+    handle_click (event, click_spec) {
+      if(click_spec.stop) {
+        event.stopPropagation()
+      }
+      if(click_spec.prevent) {
+        event.preventDefault
+      }
+      if(click_spec.ignore) {
+        return true
+      }
+    },
 
     
     norm_items (whence) {
