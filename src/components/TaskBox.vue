@@ -67,7 +67,7 @@
       >
       <v-list-item
         v-for="item in items"
-        :key="item.meta.mark"
+        :key="item.task.mark"
         :class="list_item_classes(item)"
         @mouseenter="mouse_set_active_item(item)"
         >
@@ -607,6 +607,8 @@ export default {
     norm_items (whence) {
       let index = 0
 
+      // print(this.describe('norm-A-'+whence))
+      
       if( this.spec.ux.open_rows ) {
         if(this.items.length < this.spec.ux.open_rows) {
           while(this.items.length < this.spec.ux.open_rows) {
@@ -624,7 +626,9 @@ export default {
           }
         }
       }
-  
+
+      // print(this.describe('norm-B-'+whence))
+      
       if( this.spec.ux.add_last ) {
         let item = null
 
@@ -703,11 +707,17 @@ export default {
       item.meta.state.adder = false
       item.meta.state.empty = false
       item.meta.flags.new = false
-      this.$emit('save', clone(item))
+      this.$emit('save', clone(item), (fields)=>{
+        for(let p in fields) {
+          item.task[p] = fields[p]
+        }
+      })
     },
 
     remove_item (item) {
       this.items.splice(item.meta.index,1)
+
+      console.log('VTB REMOVE', item)
       this.norm_items('remove_item')
       
       if(!item.meta.state.new) {
@@ -740,9 +750,6 @@ export default {
 
         // Internal meta data
         meta: {
-          
-          // Unique identifier
-          mark: genid('T'),
           
           // Item index
           index: meta ? meta.index : 0,
@@ -781,7 +788,8 @@ export default {
     new_task (task) {
       let new_task = null != task ? clone(task) : {
         title: '',
-        state: 'todo'
+        state: 'todo',
+        mark: genid('T'),
       }
 
       new_task.state = new_task.state || 'todo'
