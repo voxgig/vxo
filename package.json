@@ -1,6 +1,6 @@
 {
   "name": "@voxgig/vxo",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "main": "./dist/Vxo.common.js",
   "scripts": {
     "serve": "vue-cli-service serve",
