@@ -27,7 +27,7 @@
       v-if="spec.tool.add.active"
       v-bind="spec.tool.add.bind"
       :class="spec.tool.add.class"
-      @click.stop.prevent="click_add_item"
+      @click="click_add_item"
       outlined
       >
       {{ spec.tool.add.text }}
@@ -353,6 +353,12 @@ const joiprops = JoiProps({
         prevent: JT,
         ignore: JF,
       }),
+      add_item: JO({
+        stop: JT,
+        prevent: JT,
+        ignore: JF,
+        make_new: JT,
+      }),
     }),
 
     
@@ -422,7 +428,8 @@ const joiprops = JoiProps({
     }),
 
     custom: JOu({
-      title: JF
+      title: JF,
+      new_task: Joi.function()
     })
 
   }).unknown().required()
@@ -519,8 +526,14 @@ export default {
     },
 
     click_add_item () {
+      if(this.handle_click(event, this.spec.click.add_item)) return;
       this.norm_items('click_add_item')
-      this.items.push(this.make_new_item())
+
+      if( this.spec.click.add_item.make_new ) {
+        this.items.push(this.make_new_item())
+      }
+
+      this.$emit('add')
     },
 
     click_item_title (event, item) {
@@ -824,6 +837,10 @@ export default {
       new_task.state = new_task.state || 'todo'
       new_task.mark = new_task.mark || genid('T')
 
+      if(this.spec.custom.new_task) {
+        new_task = this.spec.custom.new_task(new_task)
+      }
+      
       return new_task
     },
     

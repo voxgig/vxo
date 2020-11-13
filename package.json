@@ -1,6 +1,6 @@
 {
   "name": "@voxgig/vxo",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "main": "./dist/Vxo.common.js",
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -54,12 +54,12 @@
     "nua": "^2.0.1",
     "prettier": "2.1.2",
     "sass": "1.29.0",
-    "sass-loader": "10.0.5",
+    "sass-loader": "10.1.0",
     "vue": "2.6.12",
     "vue-template-compiler": "2.6.12",
     "vuedraggable": "2.24.3",
-    "vueperslides": "2.11.0",
-    "vuetify": "2.3.16",
+    "vueperslides": "2.12.0",
+    "vuetify": "2.3.17",
     "webpack-node-externals": "2.5.2"
   }
 }
