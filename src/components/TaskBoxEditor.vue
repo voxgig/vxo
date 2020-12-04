@@ -83,7 +83,7 @@
           :name="'edit.'+field.name"
           :class="'vxo-task-box-editor-item vxo-task-box-editor-item-'+field.name"
           >
-          {{ item.task[field.name] }}
+          {{ field }} {{ item.task[field.name] }}
         </slot>
 
         

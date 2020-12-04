@@ -486,8 +486,11 @@ export default {
     }
   },
   watch: {
-    value () {
-      this.init()
+    value: {
+      deep: true,
+      handler () {
+        this.init()
+      }
     }
   },
   computed: {
