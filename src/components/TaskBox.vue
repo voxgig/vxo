@@ -744,6 +744,8 @@ export default {
 
     
     change_item_state (item) {
+      if(item.meta.flags.new && '' === item.task.title) return;
+
       item.task.state = this.spec.statemap[item.task.state] || 'todo'
       this.$emit('state', clone(item))
     },
