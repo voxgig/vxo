@@ -21,8 +21,6 @@
         class="vxo-task-box-editor-toolbar-btn"
         @click="toggle_status"
         > {{ spec.text.editor.task_state[item.task.state] }} </v-btn>
-
-
       
       <v-btn
         v-if="item.meta.new"

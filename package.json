@@ -1,6 +1,6 @@
 {
   "name": "@voxgig/vxo",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "main": "./dist/Vxo.common.js",
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -42,7 +42,7 @@
     "deepmerge": "4.2.2",
     "eslint": "7.15.0",
     "eslint-plugin-prettier": "3.3.0",
-    "eslint-plugin-vue": "7.2.0",
+    "eslint-plugin-vue": "7.3.0",
     "expect": "26.6.2",
     "fibers": "5.0.0",
     "joiprops": "0.5.1",

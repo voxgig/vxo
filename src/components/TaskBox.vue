@@ -91,14 +91,16 @@
             {{ format_task_title(item) }}            
           </p>
 
-<!--
-          <small>
+
+          <!--
+          <small style="font-size:6px;color:#080">
             {{ item.meta.index }}
             {{ item.meta.flags }}
             {{ item.meta.state }}
           </small>
--->
-
+          -->
+          
+          
           <v-text-field
             outlined
             hide-details
@@ -250,10 +252,12 @@
             min-width: 5rem;
             overflow-x: hidden;
 
+
             &:hover * {
                 cursor: pointer;
                 color: rgb(var(--vxo-cd-link)) !important;
             }
+
         }
     }
     
@@ -540,7 +544,12 @@ export default {
     },
 
     click_item_title (event, item) {
-      if(this.handle_click(event, this.spec.click.item_title)) return;
+      let ignore = this.handle_click(event, this.spec.click.item_title)
+      print('click-item-title/ignore', ignore)
+
+      if(ignore) {
+        return
+      }
       
       if(!this.spec.ux.title.edit) {
         this.edit_item(item)
@@ -557,7 +566,12 @@ export default {
     },
 
     click_act_item (item) {
-      if(this.handle_click(event, this.spec.click.act_item)) return;
+      let ignore = this.handle_click(event, this.spec.click.act_item)
+      print('click-act-item/ignore', ignore)
+
+      if(ignore) {
+        return
+      }
       
       this.norm_items('click_act_item')
       this.edit_item(item)
@@ -652,8 +666,9 @@ export default {
     
     norm_items (whence) {
       let index = 0
-
-      // print(this.describe('norm-A-'+whence))
+      let start = Date.now()
+      
+      print(this.describe('norm-start-'+whence))
       
       if( this.spec.ux.open_rows ) {
         if(this.items.length < this.spec.ux.open_rows) {
@@ -700,8 +715,9 @@ export default {
         item.meta.state.edit = false
       })
 
-      print(this.describe('norm-'+whence))
+      print(this.describe('norm-end-'+whence))
     },
+    
 
     append_item(task,meta,after_item) {
       let new_item = this.make_new_item(task, meta)
@@ -755,6 +771,13 @@ export default {
       item.meta.state.adder = false
       item.meta.state.empty = false
       item.meta.flags.new = false
+
+      let found = this.items.find(x=>x.task.mark===item.task.mark)
+      if(found) {
+        found.task = {...found.task, ...item.task}
+        this.$forceUpdate()
+      }
+      
       this.$emit('save', clone(item), (fields)=>{
         for(let p in fields) {
           item.task[p] = fields[p]
@@ -765,7 +788,6 @@ export default {
     remove_item (item) {
       this.items.splice(item.meta.index,1)
 
-      console.log('VTB REMOVE', item)
       this.norm_items('remove_item')
       
       if(!item.meta.state.new) {
@@ -853,7 +875,9 @@ export default {
       let title = (item.meta.state.empty ? '' :
                    item.meta.state.adder ? this.spec.text.add_last :
                    item.task.title)
-      return null == title ? '' : title
+      title = null == title ? '' : title
+
+      return title
     },
 
     focus_item_title_edit (item) {
@@ -865,7 +889,7 @@ export default {
       })
     },
 
-        make_text_style (field) {
+    make_text_style (field) {
       let style = {}
       if(field.color) {
         style.color = field.color
@@ -901,6 +925,7 @@ export default {
     editor_update_field ({field,item}) {
       if(this.editor_item) {
         this.$set(this.editor_item.task, field.name, item.task[field.name])
+        this.save_item(this.editor_item)
       }
     },
     editor_delete_item () {
