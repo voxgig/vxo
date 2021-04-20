@@ -1,0 +1,1 @@
+import{defineComponent as r,openBlock as e,createBlock as o,toDisplayString as t,withScopeId as a}from"vue";var d=r({name:"HelloWorld",props:{msg:{type:String,required:!0}}});const n=a("data-v-9f570404")(((r,a,d,n,p,s)=>(e(),o("h1",null,"C0 "+t(r.msg),1))));d.render=n,d.__scopeId="data-v-9f570404";const p=d;export{p as VxoHelloWorld};
